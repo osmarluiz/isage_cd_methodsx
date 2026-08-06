@@ -2,49 +2,46 @@
 % BACKGROUND — max 500 words (MethodsX requirement)
 % =============================================================
 
-Change detection compares two co-registered satellite images and
-tells you which pixels changed. Deforestation monitoring, disaster
-response, and land-use mapping all depend on it. Supervised methods
-need per-pixel labels for both dates. Producing those labels is slow:
-a single 1000-tile Amazon scene can take several weeks of an expert's
-time. Scaling to more years or more regions is the practical
-bottleneck.
+iSAGE~\cite{isage} recently showed that sparse point supervision can
+match dense labeling in remote-sensing semantic segmentation. Expert
+clicks placed on the model's confident mistakes recover most of the
+mIoU obtained with full dense labels. On the BsB Aerial dataset,
+iSAGE reached 97.2\% of the dense mIoU with 0.040\% of the pixels.
+On ISPRS Vaihingen, it matched the dense baseline (76.78\% versus
+76.65\% mIoU) with only 0.011\% of the pixels. The mechanism is
+minimal: an error-weighted loss amplifies the gradient at each click.
+There are no pseudo-labels, no conditional random fields, no
+foundation-model prompts. The annotation record is the dataset.
 
-iSAGE~\cite{isage} showed that dense labels are not always necessary.
-For remote-sensing semantic segmentation, an expert who clicks only
-on the model's confident mistakes reaches nearly the same quality as
-full dense annotation. On the BsB Aerial dataset, iSAGE recovered
-97.2\% of the dense mIoU using 0.040\% of the pixels. On ISPRS
-Vaihingen it matched the dense baseline (76.78\% versus 76.65\% mIoU)
-with 0.011\% of the pixels. The mechanism is small: an error-weighted
-loss amplifies the gradient at each click. There are no
-pseudo-labels, no conditional random fields, no foundation-model
-prompts. The annotation record is the dataset.
+Change detection is a different task, and one in which annotation is
+at least as demanding. The output is not the class of a pixel in a
+single image but the presence of change across two co-registered
+dates. The labeler has to compare both images and reason about the
+transition, not about one scene. Producing dense per-pixel change
+masks over large areas remains costly.
 
-iSAGE works on one image. Change detection asks more. A label only
-has meaning when both dates are present: the same polygon can
-indicate ``recent deforestation'' against one before-image and
-``old deforestation'' against another. The same after-image is often
-labeled against several before-images, and each pairing is a separate
-training sample. Standard annotation tools attach labels to one
-image. If the paired image changes, the labels have to be copied or
-reprojected, and both routes introduce silent errors.
+The iSAGE approach has not been extended to change detection. Its
+original design targets single-image semantic segmentation, and a
+label is bound to one image. In the bi-temporal case, a label is
+anchored to a pair of dates, and the same fixed scene can be labeled
+against several reference images. Bringing the iSAGE philosophy to
+change detection is the goal of this work.
 
-iSAGE-CD adapts iSAGE to change detection. Three design choices
-differ from the original. First, labels are anchored to a pair, not
-to an image: each JSON file stores one (reference, frame) pair and
-holds only the points that make sense in that pair. Second, the
-annotator shows two synchronized canvases; zoom, pan, and clicks are
-shared between them. Third, the annotation tree and the dataset are
-the same directory, so splitting by frame folder gives a
-leakage-free split by construction. The iterative click loop, the
-error-weighted loss, and the refusal to insert machinery between
-click and gradient are inherited from iSAGE unchanged.
+iSAGE-CD adapts iSAGE to the bi-temporal setting. It preserves the
+iterative click loop, the error-weighted loss, and the refusal to
+insert machinery between click and gradient. Three design choices
+distinguish it from the original. First, labels are anchored to a
+pair, not to an image: each JSON file stores one (reference, frame)
+pair and holds only the points that make sense in that pair. Second,
+the annotator shows two synchronized canvases; zoom, pan, and clicks
+are shared between them. Third, the annotation tree and the dataset
+are the same directory, and splitting by frame folder is a
+leakage-free split by construction.
 
 This article describes iSAGE-CD as a reproducible method. Full
 quantitative evaluation against dense supervision, comparison with
 PRODES, and a study with multiple human annotators are the subject
 of a separate manuscript in preparation. Here we cover the tool, the
-session format, and the protocol, and we validate them on an Amazon
+session format, and the protocol, and validate them on an Amazon
 deforestation session using Planet imagery aligned to the PRODES
 2022 calendar (August 2021 -- July 2022).
