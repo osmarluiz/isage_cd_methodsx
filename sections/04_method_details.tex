@@ -1,1 +1,121 @@
-% TODO: draft 04_method_details
+% =============================================================
+% METHOD DETAILS
+% =============================================================
+
+% -------------------------------------------------------------
+% 4.1 Overview
+% -------------------------------------------------------------
+\subsection{Overview}
+\label{sec:overview}
+
+The iSAGE-CD annotator shows two co-registered images side by side.
+The user clicks on either canvas and a point appears at the same
+pixel on both. Zoom, pan, and points are shared between the two
+views. The workflow follows iSAGE: an expert clicks on the model's
+confident mistakes, the corrected labels feed the next training
+round. The unit of annotation is a pair of dates, not a single image.
+
+Three terms structure the rest of the description. A \emph{frame} is
+the fixed image of the event, typically the higher-resolution or
+post-event scene. A \emph{reference} is an image paired with the
+frame, typically the pre-event scene; a frame may have one reference
+(classic two-date change detection) or several (a monthly time
+series, for example). A \emph{pair} is a (reference, frame) tuple,
+and it is the unit of annotation and of training. Each pair keeps
+its own point set, and the same frame can be labeled against several
+references independently.
+
+% ------------------------------------------------------------------
+% FIGURE — high-level pipeline diagram
+% ------------------------------------------------------------------
+% TODO: replace placeholder with real diagram — three blocks:
+%   (A) dual-canvas UI receiving clicks on a pair;
+%   (B) annotation tree = training dataset;
+%   (C) click loop (annotate -> train -> predict -> review -> annotate).
+\begin{figure}[htbp]
+  \centering
+  \fbox{\parbox{0.9\linewidth}{\centering
+    \vspace{2cm}
+    \emph{[Figure~\ref{fig:overview}: pipeline diagram --
+    dual-canvas UI, annotation tree as dataset, iterative click loop]}
+    \vspace{2cm}
+  }}
+  \caption{Overview of iSAGE-CD. The user annotates a
+    \emph{pair} on two co-registered canvases; the annotation tree is
+    the training dataset; iterations advance by training on the current
+    points, generating predictions, and letting the user click on
+    remaining errors.}
+  \label{fig:overview}
+\end{figure}
+
+Because the pair is the annotation unit, iSAGE-CD stores one file
+per pair. A frame with three references has three annotation files,
+each containing only the points that make sense in that pair.
+Switching the reference in the interface switches the point set on
+both canvases. This preserves the semantics of a change label: a
+cleared area may be labeled \emph{new} against one reference date
+and \emph{old} against another, and neither label contaminates the
+other.
+
+The directory that holds the images and the directory that holds the
+annotations are the same session. There is no export step: the
+annotation tree already has the layout of a training dataset. A
+held-out split reduces to selecting a subset of frame folders;
+nothing crosses between train and validation because pairs of the
+same frame all live in the same folder. This eliminates a class of
+subtle bugs where the same scene appears on both sides of a split.
+
+The training protocol is inherited from iSAGE without change. The
+user annotates points; the model is trained with an error-weighted
+loss that amplifies the gradient at each labeled pixel; the trained
+model produces per-pair predictions; the user reviews those
+predictions, focuses on the model's confident mistakes, and adds new
+points where the model is wrong. The loop repeats until the
+annotations stabilize. No pseudo-labels, conditional random fields,
+or foundation-model prompts are inserted between the clicks and the
+loss. What iSAGE-CD adds is in the representation of the pair, not
+in the training procedure.
+
+The remainder of this section makes each of these decisions concrete.
+Section~\ref{sec:session_structure} describes the session directory
+tree and how a session is initialized. Section~\ref{sec:ui} covers
+the bi-temporal annotation interface. Section~\ref{sec:label_format}
+specifies the pair-anchored label file. Section~\ref{sec:iteration}
+details the iteration protocol and how model predictions are
+displayed. Section~\ref{sec:exchange} describes round-based data
+exchange between annotators.
+
+% -------------------------------------------------------------
+% 4.2 Session structure and initialization  (TODO)
+% -------------------------------------------------------------
+\subsection{Session structure and initialization}
+\label{sec:session_structure}
+% TODO
+
+% -------------------------------------------------------------
+% 4.3 Bi-temporal annotation interface  (TODO)
+% -------------------------------------------------------------
+\subsection{Bi-temporal annotation interface}
+\label{sec:ui}
+% TODO
+
+% -------------------------------------------------------------
+% 4.4 Pair-anchored label format  (TODO)
+% -------------------------------------------------------------
+\subsection{Pair-anchored label format}
+\label{sec:label_format}
+% TODO
+
+% -------------------------------------------------------------
+% 4.5 Iteration workflow and predictions  (TODO)
+% -------------------------------------------------------------
+\subsection{Iteration workflow and predictions}
+\label{sec:iteration}
+% TODO
+
+% -------------------------------------------------------------
+% 4.6 Round-trip data exchange  (TODO)
+% -------------------------------------------------------------
+\subsection{Round-trip data exchange}
+\label{sec:exchange}
+% TODO
