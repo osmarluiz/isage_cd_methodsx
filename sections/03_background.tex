@@ -2,46 +2,54 @@
 % BACKGROUND — max 500 words (MethodsX requirement)
 % =============================================================
 
-iSAGE~\cite{isage} recently showed that sparse point supervision can
-match dense labeling in remote-sensing semantic segmentation. Expert
-clicks placed on the model's confident mistakes recover most of the
-mIoU obtained with full dense labels. On the BsB Aerial dataset,
-iSAGE reached 97.2\% of the dense mIoU with 0.040\% of the pixels.
-On ISPRS Vaihingen, it matched the dense baseline (76.78\% versus
-76.65\% mIoU) with only 0.011\% of the pixels. The mechanism is
-minimal: an error-weighted loss amplifies the gradient at each click.
-There are no pseudo-labels, no conditional random fields, no
-foundation-model prompts. The annotation record is the dataset.
+Producing pixel-level labels is the main cost of building a
+supervised remote-sensing dataset. An analyst has to look at every
+image, decide the class of each pixel of interest, and draw or paint
+the mask. As datasets grow, expert time becomes the binding
+constraint, and reducing this cost without losing quality has been a
+central concern of the field for years.
 
-Change detection is a different task, and one in which annotation is
-at least as demanding. The output is not the class of a pixel in a
-single image but the presence of change across two co-registered
-dates. The labeler has to compare both images and reason about the
-transition, not about one scene. Producing dense per-pixel change
-masks over large areas remains costly.
+Several strategies attack this cost. Weakly supervised methods
+replace dense masks with image-level tags or scribbles.
+Semi-supervised methods combine a small labeled set with a larger
+unlabeled one. Active learning selects which samples the human should
+label next so that each label carries the most information. In
+human-in-the-loop annotation the user and the model take turns: the
+model proposes a mask, the user corrects it, and the corrected labels
+feed the next training round. Point supervision replaces dense masks
+with a small set of clicks, keeping the human effort per sample low
+while still letting the model see where it is right and where it is
+wrong.
 
-The iSAGE approach has not been extended to change detection. Its
-original design targets single-image semantic segmentation, and a
-label is bound to one image. In the bi-temporal case, a label is
-anchored to a pair of dates, and the same fixed scene can be labeled
-against several reference images. Bringing the iSAGE philosophy to
-change detection is the goal of this work.
+iSAGE~\cite{isage} is a recent point-based, human-in-the-loop
+framework for remote-sensing semantic segmentation. It showed that an
+expert who clicks only on the model's confident mistakes can recover
+most of the quality of dense labeling. On the BsB Aerial dataset,
+iSAGE reached 97.2\% of the dense mIoU using 0.040\% of the pixels.
+On ISPRS Vaihingen it matched the dense baseline (76.78\% versus
+76.65\% mIoU) with 0.011\% of the pixels. The mechanism is small: an
+error-weighted loss amplifies the gradient at each click. There are
+no pseudo-labels, no conditional random fields, no foundation-model
+prompts. The annotation record is the dataset.
 
-iSAGE-CD adapts iSAGE to the bi-temporal setting. It preserves the
-iterative click loop, the error-weighted loss, and the refusal to
-insert machinery between click and gradient. Three design choices
-distinguish it from the original. First, labels are anchored to a
-pair, not to an image: each JSON file stores one (reference, frame)
-pair and holds only the points that make sense in that pair. Second,
-the annotator shows two synchronized canvases; zoom, pan, and clicks
-are shared between them. Third, the annotation tree and the dataset
-are the same directory, and splitting by frame folder is a
-leakage-free split by construction.
+Change detection is another core remote-sensing task with the same
+labeling problem. Instead of classifying pixels in a single image,
+the analyst compares two co-registered dates and marks where change
+occurred. The unit of analysis is the pair, not the image, and the
+same fixed scene can be labeled against several reference dates.
+Annotating change is therefore at least as expensive as annotating a
+single-date scene.
 
-This article describes iSAGE-CD as a reproducible method. Full
-quantitative evaluation against dense supervision, comparison with
-PRODES, and a study with multiple human annotators are the subject
-of a separate manuscript in preparation. Here we cover the tool, the
-session format, and the protocol, and validate them on an Amazon
-deforestation session using Planet imagery aligned to the PRODES
-2022 calendar (August 2021 -- July 2022).
+iSAGE was designed for the single-image case, and its label file,
+click loop, and error-weighted loss all assume one image per
+annotation. This article introduces \textbf{iSAGE-CD}, an adaptation
+of iSAGE to change detection. We describe the tool, the session
+format, and the annotation workflow, and we illustrate them with a
+real session on Amazon deforestation using Planet imagery aligned to
+the PRODES 2022 calendar (August 2021 -- July 2022). The session was
+run as a working user would run it, without a fixed budget of clicks
+per tile or a fixed number of iterations; the goal here is to
+document a reproducible method, not to run a controlled experiment.
+A full quantitative evaluation -- comparison with dense supervision,
+PRODES benchmarking, and a multi-annotator study -- is the subject
+of a separate manuscript in preparation.
