@@ -1,0 +1,116 @@
+% =============================================================
+% Figure 1 (fig:overview) — iSAGE-CD pipeline diagram
+% Three-panel layout: A. Interaction | B. Data | C. Training loop
+% =============================================================
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  font=\sffamily\footnotesize,
+  panel/.style={draw=black!40, rounded corners=3pt,
+                inner sep=10pt, minimum height=6cm},
+  canvas/.style={draw=black, thick,
+                 minimum width=1.8cm, minimum height=1.8cm,
+                 fill=green!15},
+  loopbox/.style={draw=black!50, rounded corners=2pt,
+                  minimum width=2.5cm, minimum height=0.75cm,
+                  fill=gray!5, align=center, inner sep=2pt},
+  arr/.style={-{Latex[length=2mm]}, thick},
+  pt/.style={circle, minimum size=4.5pt, inner sep=0pt,
+             draw=black!70, line width=0.3pt},
+  panellabel/.style={font=\bfseries},
+  caption/.style={font=\scriptsize\itshape},
+]
+
+% ================================================================
+% PANEL A — Interaction (dual-canvas UI)
+% ================================================================
+\node[panel, minimum width=5.0cm] (A) at (0,0) {};
+\node[panellabel, above=1pt of A.north west, anchor=south west]
+     {A.\ Interaction};
+
+% Reference selector at top of panel
+\node[font=\scriptsize] at ($(A.north) + (0, -0.45)$)
+     {$\blacktriangleleft$~\texttt{antes\_202108}~$\blacktriangleright$};
+
+% The two co-registered canvases
+\node[canvas] (before) at ($(A.center) + (-1.05, 0.2)$) {};
+\node[canvas] (after)  at ($(A.center) + (+1.05, 0.2)$) {};
+
+% Simulated "cleared area" patches (same relative position on both)
+\fill[orange!45] ($(before.south west) + (0.25, 0.30)$)
+                  rectangle ++(0.90, 0.70);
+\fill[orange!45] ($(before.south west) + (1.30, 1.10)$)
+                  rectangle ++(0.30, 0.30);
+\fill[orange!45] ($(after.south west)  + (0.25, 0.30)$)
+                  rectangle ++(1.10, 0.85);
+\fill[orange!45] ($(after.south west)  + (1.30, 1.10)$)
+                  rectangle ++(0.40, 0.40);
+
+% Three points, same relative offset on both canvases (co-registered clicks)
+\foreach \dx/\dy/\c in {%
+   0.35/0.35/red!85,
+  -0.45/-0.25/green!55!black,
+   0.50/-0.50/red!85%
+}{
+  \node[pt, fill=\c] at ($(before.center) + (\dx,\dy)$) {};
+  \node[pt, fill=\c] at ($(after.center)  + (\dx,\dy)$) {};
+}
+
+% Labels below each canvas
+\node[below=1pt of before, font=\scriptsize] {\textsc{reference}};
+\node[below=1pt of after,  font=\scriptsize] {\textsc{frame}};
+
+% Bottom caption
+\node[caption] at ($(A.south) + (0, 0.35)$)
+     {clicks are co-registered on both canvases};
+
+% ================================================================
+% PANEL B — Data (annotation tree == dataset)
+% ================================================================
+\node[panel, minimum width=5.4cm, right=8mm of A] (B) {};
+\node[panellabel, above=1pt of B.north west, anchor=south west]
+     {B.\ Data};
+
+\node[font=\ttfamily\scriptsize, align=left] at (B.center) {%
+Sessions/Amazon/\\
+$\vdash$\ data/dataset/train/\\
+\hphantom{$\vdash$}\ \ $\vdash$\ images/0000.png\\
+\hphantom{$\vdash$}\ \ $\vdash$\ images\_before/\\
+\hphantom{$\vdash$}\ \ \ \ \ \ $\vdash$\ 0000/antes\_202108.png\\
+$\vdash$\ iteration\_0/\\
+\hphantom{$\vdash$}\ \ $\vdash$\ annotations/0000/\\
+\hphantom{$\vdash$}\ \ \ \ \ \ $\vdash$\ 202108.json\\
+\hphantom{$\vdash$}\ \ $\vdash$\ predictions/\\
+\hphantom{$\vdash$}\ \ $\vdash$\ models/\\
+$\vdash$\ iteration\_1/~\dots%
+};
+
+\node[caption] at ($(B.south) + (0, 0.35)$)
+     {annotation tree $=$ training dataset};
+
+% ================================================================
+% PANEL C — Training (iterative click loop)
+% ================================================================
+\node[panel, minimum width=3.6cm, right=8mm of B] (C) {};
+\node[panellabel, above=1pt of C.north west, anchor=south west]
+     {C.\ Training};
+
+\node[loopbox] (an) at ($(C.center) + (0.15,  1.80)$)
+     {annotate\\{\tiny clicks on pair}};
+\node[loopbox] (tr) at ($(C.center) + (0.15,  0.60)$)
+     {train\\{\tiny error-weighted}};
+\node[loopbox] (pr) at ($(C.center) + (0.15, -0.60)$)
+     {predict\\{\tiny per pair}};
+\node[loopbox] (re) at ($(C.center) + (0.15, -1.80)$)
+     {review\\{\tiny model errors}};
+
+\draw[arr] (an) -- (tr);
+\draw[arr] (tr) -- (pr);
+\draw[arr] (pr) -- (re);
+% loop-back
+\draw[arr] (re.west) to[out=180, in=180, looseness=1.5] (an.west);
+
+\node[caption] at ($(C.south) + (0, 0.35)$)
+     {iSAGE loop, unchanged};
+
+\end{tikzpicture}%
+}

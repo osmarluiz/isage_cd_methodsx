@@ -26,25 +26,22 @@ its own point set, and the same frame can be labeled against several
 references independently.
 
 % ------------------------------------------------------------------
-% FIGURE — high-level pipeline diagram
+% FIGURE 1 — high-level pipeline diagram (TikZ, first pass)
 % ------------------------------------------------------------------
-% TODO: replace placeholder with real diagram — three blocks:
-%   (A) dual-canvas UI receiving clicks on a pair;
-%   (B) annotation tree = training dataset;
-%   (C) click loop (annotate -> train -> predict -> review -> annotate).
 \begin{figure}[htbp]
   \centering
-  \fbox{\parbox{0.9\linewidth}{\centering
-    \vspace{2cm}
-    \emph{[Figure~\ref{fig:overview}: pipeline diagram --
-    dual-canvas UI, annotation tree as dataset, iterative click loop]}
-    \vspace{2cm}
-  }}
-  \caption{Overview of iSAGE-CD. The user annotates a
-    \emph{pair} on two co-registered canvases; the annotation tree is
-    the training dataset; iterations advance by training on the current
-    points, generating predictions, and letting the user click on
-    remaining errors.}
+  \input{figures/fig_overview}
+  \caption{Overview of iSAGE-CD. \textbf{(A)} The bi-temporal
+    annotation interface shows the reference and the frame side by
+    side; clicks are co-registered on both canvases and a selector
+    at the top switches between reference dates. \textbf{(B)} The
+    session directory holds the images, the pair-anchored annotation
+    files, and the training artefacts (models, predictions) in the
+    same tree, so the annotation tree \emph{is} the training dataset.
+    \textbf{(C)} The training loop is inherited from iSAGE without
+    change: the user annotates points, the model is trained with an
+    error-weighted loss, per-pair predictions are generated, and the
+    user reviews the model's confident mistakes.}
   \label{fig:overview}
 \end{figure}
 
