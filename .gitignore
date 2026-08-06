@@ -1,0 +1,20 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.pdf
+!figures/*.pdf
+
+# Editor
+.vscode/
+*.swp
+.DS_Store
+
+# Overleaf sync
+.overleaf/

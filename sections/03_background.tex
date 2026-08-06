@@ -1,0 +1,60 @@
+% =============================================================
+% BACKGROUND — max 500 words (MethodsX requirement)
+% =============================================================
+% Word count target: ~450-490 words.
+% Purpose: motivate why iSAGE-CD exists — cost of dense CD labels,
+% success of iSAGE for mono-temporal semseg, gap left by iSAGE for
+% bi-temporal tasks, our design decisions.
+% =============================================================
+
+Change detection between two co-registered dates underpins deforestation
+monitoring, disaster response, and land-use accounting~\cite{prodes,mapbiomas}.
+Its supervised formulation requires pixel-level labels on both dates, a
+cost that grows with area, event frequency, and the precision demanded by
+downstream reporting. Dense annotation of a single 1000-tile Amazon scene
+can consume weeks of expert time; extending the protocol across years or
+biomes becomes the practical bottleneck.
+
+Recent work on sparse point supervision has challenged the assumption
+that dense labels are unavoidable. iSAGE~\cite{isage} showed that, for
+remote-sensing semantic segmentation, expert clicks targeting confident
+model errors recover the quality of dense supervision at a fraction of a
+percent of the pixel budget: 97.2\% of the dense mIoU on BsB Aerial with
+0.040\% of pixels, and a match of the dense baseline on ISPRS Vaihingen
+(76.78\% vs.\ 76.65\% mIoU) with only 0.011\% of pixels. The key mechanism
+is architectural minimalism -- an error-weighted loss amplifies the
+gradient at each click, and no auxiliary machinery (pseudo-labels,
+conditional random fields, foundation-model prompts) is required. The
+annotation record itself functions as an auditable, extensible dataset.
+
+iSAGE, however, addresses single-image segmentation. Change detection
+imposes constraints that a mono-temporal design does not accommodate.
+First, the semantics of a label depend on \emph{two} dates: the same
+polygon may indicate ``recent deforestation'' relative to one reference
+image and ``stable deforestation'' relative to another. Second, the same
+fixed scene is often labeled against multiple candidate references (for
+example, a monthly series in which the annotator picks the cleanest one),
+and each such comparison is an independent training sample. Third, storing
+labels alongside a single image forces either duplication or
+projection~\cite{isprsCDreview}, both of which risk introducing subtle
+inconsistencies when the reference changes.
+
+iSAGE-CD extends the iSAGE philosophy to the bi-temporal setting through
+three design decisions. (i)~\emph{Pair-anchored labels}: each JSON file
+records a single (reference, frame) pair and carries only points that are
+meaningful under that pair; changing the reference switches the point
+set. (ii)~\emph{Dual synchronized canvases}: zoom, pan, and points are
+co-registered on both dates, and the click gesture is agnostic to which
+canvas the user acts on. (iii)~\emph{Session-as-dataset}: the annotation
+tree mirrors the dataset layout, so the annotation record \emph{is} the
+training set and leakage-free splits reduce to splitting by frame folder.
+The iterative click-loop of iSAGE is preserved: after each training
+round, the model's confident errors on the current frame guide the next
+set of clicks; no expansion machinery is inserted between click and loss.
+
+This article describes iSAGE-CD as a reproducible method. Complete
+quantitative evaluation against dense supervision, comparison with
+alternative sparse-annotation tools, and downstream deforestation
+mapping are the subject of a separate manuscript. Here we focus on the
+tool, the session format, and the protocol, and validate them on an
+Amazon deforestation session aligned to the PRODES 2022 calendar.

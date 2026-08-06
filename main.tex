@@ -1,0 +1,101 @@
+\documentclass[review,3p,times]{elsarticle}
+
+\usepackage{lineno}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xurl}
+
+\graphicspath{{figures/}}
+
+\journal{MethodsX}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{iSAGE-CD: sparse point supervision for bi-temporal change detection
+       with pair-anchored annotations}
+
+% \author[1]{Osmar Luiz Ferreira de Carvalho\corref{cor1}}
+% \ead{osmaracj@gmail.com}
+% \cortext[cor1]{Corresponding author}
+% \affiliation[1]{organization={University of Bras\'ilia},
+%                 city={Bras\'ilia},
+%                 country={Brazil}}
+
+\begin{abstract}
+% [~300 words placeholder]
+Change detection in remote sensing requires per-pixel labels on two
+co-registered dates, a cost that scales poorly with area and event
+frequency. iSAGE has shown that, in single-image semantic segmentation,
+expert clicks targeting confident model errors recover dense supervision
+quality at a fraction of a percent of the pixel budget. We extend that
+philosophy to the bi-temporal case with iSAGE-CD: a session format,
+annotation UI, and iteration protocol whose fundamental unit is the
+\emph{pair} rather than the image. Labels are anchored to a
+(reference, frame) pair, two synchronized canvases enforce a shared pixel
+grid, and the annotation tree \emph{is} the dataset -- no separate export.
+We describe the method and apply it to Amazon deforestation using Planet
+imagery aligned to the PRODES 2022 calendar. Code is released under CC BY 4.0
+at \url{https://github.com/osmarluiz/isage_cd}.
+\end{abstract}
+
+\begin{keyword}
+change detection \sep sparse supervision \sep human-in-the-loop \sep
+remote sensing \sep deforestation \sep annotation tool
+\end{keyword}
+
+\end{frontmatter}
+
+% ------------------------------------------------------------------
+% Specifications table (MethodsX required)
+% ------------------------------------------------------------------
+\input{sections/02_specifications_table}
+
+% ------------------------------------------------------------------
+% Background (max 500 words)
+% ------------------------------------------------------------------
+\section*{Background}
+\input{sections/03_background}
+
+% ------------------------------------------------------------------
+% Method details
+% ------------------------------------------------------------------
+\section*{Method details}
+\input{sections/04_method_details}
+
+% ------------------------------------------------------------------
+% Method validation
+% ------------------------------------------------------------------
+\section*{Method validation}
+\input{sections/05_method_validation}
+
+% ------------------------------------------------------------------
+% Limitations
+% ------------------------------------------------------------------
+\section*{Limitations}
+\input{sections/06_limitations}
+
+% ------------------------------------------------------------------
+% Ethics / declarations / acknowledgements
+% ------------------------------------------------------------------
+\section*{Ethics statements}
+\input{sections/07_ethics}
+
+\section*{Declaration of competing interest}
+The authors declare no known competing financial interests or personal
+relationships that could have influenced the work reported in this
+article.
+
+\section*{Acknowledgements}
+\input{sections/08_acknowledgements}
+
+% ------------------------------------------------------------------
+% References
+% ------------------------------------------------------------------
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
+
+\end{document}
