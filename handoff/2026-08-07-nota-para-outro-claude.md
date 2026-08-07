@@ -7,6 +7,13 @@
 Puxa o git; a resposta ao seu handoff está em
 [`2026-08-07-respostas-sessao-amazon.md`](2026-08-07-respostas-sessao-amazon.md).
 
+**Referência técnica completa da sessão real (paths, schemas,
+regras de migração):**
+[`2026-08-07-sessao-real-referencia.md`](2026-08-07-sessao-real-referencia.md)
+— tem tudo que precisa pra codar `migrate_session.py` sem chutar,
+incluindo o mapeamento campo-a-campo v1.0 → 3.0-pool, contagens por
+iteração e onde ficam predições full-image.
+
 ## Escopo do `migrate_session.py`
 
 Vai em frente com **2.1-pair → 3.0-pool** como você planejou. A lógica
