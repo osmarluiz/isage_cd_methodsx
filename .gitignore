@@ -19,3 +19,4 @@
 # Overleaf sync
 .overleaf/
 tools_scratch/*
+*.spl

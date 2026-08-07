@@ -10,16 +10,18 @@ constraint, and reducing this cost without losing quality has been a
 central concern of the field for years.
 
 Several strategies attack this cost. Weakly supervised methods
-replace dense masks with image-level tags or scribbles.
+replace dense masks with image-level tags or
+scribbles~\cite{lin2016scribblesup,hua2021semantic}.
 Semi-supervised methods combine a small labeled set with a larger
-unlabeled one. Active learning selects which samples the human should
-label next so that each label carries the most information. In
+unlabeled one~\cite{zhou2026decaf}. Active learning selects which samples the
+human should label next so that each label carries the most
+information~\cite{ren2021survey}. In
 human-in-the-loop annotation the user and the model take turns: the
 model proposes a mask, the user corrects it, and the corrected labels
-feed the next training round. Point supervision replaces dense masks
-with a small set of clicks, keeping the human effort per sample low
-while still letting the model see where it is right and where it is
-wrong.
+feed the next training round~\cite{amershi2014power,lenczner2022dial}. Point
+supervision replaces dense masks with a small set of clicks, keeping the human
+effort per sample low while still letting the model see where it is right and
+where it is wrong~\cite{Bearman2016}.
 
 iSAGE~\cite{isage} (\emph{Iterative Sparse Annotation Guided by
 Expert}) is a recent point-based, human-in-the-loop framework for
@@ -36,12 +38,12 @@ annotation, training, and data management to live in a single
 integrated environment. The annotation record is the dataset.
 
 Change detection is another core remote-sensing task with the same
-labeling problem. Instead of classifying pixels in a single image,
-the analyst compares two co-registered dates and marks where change
-occurred. The unit of analysis is the pair, not the image, and the
+labeling problem~\cite{khelifi2020deep,daudt2018fully}. Instead of classifying
+pixels in a single image, the analyst compares two co-registered dates and marks
+where change occurred. The unit of analysis is the pair, not the image, and the
 same fixed scene can be labeled against several reference dates.
 Annotating change is therefore at least as expensive as annotating a
-single-date scene.
+single-date scene~\cite{chen2020spatial,fang2024point}.
 
 iSAGE was designed for the single-image case, and its label file,
 click loop, and error-weighted loss all assume one image per

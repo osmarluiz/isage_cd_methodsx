@@ -10,13 +10,13 @@
 
 We validated iSAGE-CD by running a working annotation session over
 a scene of the Brazilian Amazon in the region of the deforestation
-arc. The imagery is PlanetScope surface reflectance in four bands
-(blue, green, red, near infrared) at 3\,m ground sample distance;
+arc. The imagery is PlanetScope surface reflectance~\cite{nicfi2021basemaps} in four
+bands (blue, green, red, near infrared) at 3\,m ground sample distance;
 the scene is diced into 2000 tiles of $1024 \times 1024$ pixels.
 Two class indices are used: \emph{no change} and \emph{change}
 (deforestation between the two dates), consistent with the binary
-supervision that the PRODES~\cite{prodes} deforestation product
-provides at the polygon level.
+supervision that operational deforestation products such as
+PRODES~\cite{prodes} and MapBiomas~\cite{mapbiomas} provide at the polygon level.
 
 The session comprises two annotation blocks, both covering the
 PRODES 2022 monitoring window (Aug 2021 -- Jul 2022). Block~A uses
