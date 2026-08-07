@@ -1,8 +1,9 @@
 % =============================================================
 % Figure 1 (fig:overview) — iSAGE-CD pipeline diagram
 % Layout: A on top (full width) ; B and C side-by-side below.
-% Panel labels are drawn INSIDE the top-left corner of each panel
-% so they cannot overlap adjacent panels.
+% Panel A label sits ABOVE the panel (image already has its own UI
+% header). Panel B and C labels are inside their top-left corners,
+% since they are schematic and have plenty of blank space there.
 % =============================================================
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
@@ -24,19 +25,15 @@
 \node[panel] (A) at (0, 0) {%
   \includegraphics[width=15.4cm]{figures/screenshot_ui.png}%
 };
-% Label INSIDE the top-left corner, slightly inset
-\node[panellabel, anchor=north west] at ($(A.north west) + (4pt, -4pt)$)
+% Label OUTSIDE (above the panel) so it does not overlap the image
+\node[panellabel, above=1pt of A.north west, anchor=south west]
      {A.\ Interaction};
-% Caption below Panel A
-\node[caption, below=2pt of A.south]
-     {\textsc{isage-cd} annotator on the Amazon session
-      (before Jun 2021, after Jun 2022); clicks are co-registered};
 
 % ================================================================
 % PANEL B — Data (annotation tree == dataset), bottom-left
 % ================================================================
 \node[panel, minimum width=7.4cm, minimum height=6.4cm,
-      below=14mm of A.south west, anchor=north west] (B) {};
+      below=6mm of A.south west, anchor=north west] (B) {};
 \node[panellabel, anchor=north west] at ($(B.north west) + (4pt, -4pt)$)
      {B.\ Data};
 
@@ -61,7 +58,7 @@ Sessions/Amazon/\\
 % PANEL C — Training (iterative click loop), bottom-right
 % ================================================================
 \node[panel, minimum width=7.4cm, minimum height=6.4cm,
-      below=14mm of A.south east, anchor=north east] (C) {};
+      below=6mm of A.south east, anchor=north east] (C) {};
 \node[panellabel, anchor=north west] at ($(C.north west) + (4pt, -4pt)$)
      {C.\ Training};
 
