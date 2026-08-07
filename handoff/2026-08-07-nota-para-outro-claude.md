@@ -9,10 +9,25 @@ Puxa o git; a resposta ao seu handoff está em
 
 ## Escopo do `migrate_session.py`
 
-Vai em frente com **2.1-pair → 3.0-pool** como você planejou. A sessão
-Amazon "real" (2000 tiles, 5 iterações) tem uma origem cosmeticamente
-diferente do formato 2.1-pair, mas a lógica de migração é a mesma
-— não precisa se preocupar com isso.
+Vai em frente com **2.1-pair → 3.0-pool** como você planejou. A lógica
+serve tanto pra amostra de 20 tiles do repo `isage_cd` quanto pra
+sessão real da máquina de anotação (2000 tiles, 5 iterações, 143k
+pontos) — as diferenças com o formato do repo `amazon` são cosméticas,
+resolvidas na hora da conversão, e não precisam de código separado.
+
+## Referência importante pra o paper
+
+A **Method Validation** deste artigo é ancorada na **sessão real**
+(2000 tiles, 5 iterações, 143.634 pontos) — todos os números do
+Abstract, das seções 5.1--5.3, da Fig 2 (convergência v1--v5) e da
+Fig 3 (qualitativa) vêm dela. A amostra de 20 tiles no repo `isage_cd`
+serviu só pra gerar o screenshot da Fig 1A.
+
+Consequência prática: assim que a UI 3.0-pool estabilizar e o
+`migrate_session.py` estiver pronto, quero migrar a sessão real
+completa (não a amostra) pra poder regerar Fig 1A com dados
+representativos e manter coerência com o resto do paper. Só me avisa
+quando o script estiver testado.
 
 ## O essencial pra o script (do MD grande)
 
