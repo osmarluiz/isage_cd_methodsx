@@ -31,14 +31,20 @@ was actually built, and the two blocks together provided the pool
 from which the training iterations were carried out.
 
 Annotation was performed by a single expert working the tool as a
-practitioner would --- no budget of clicks per tile was imposed and
-no target number of iterations was set in advance. In total, 1999
-of the 2000 tiles received at least one point; 143{,}634 points
-were placed, with a median of 43 points per tile (min 3, max 702)
-and an approximately balanced class split (54.6\% \emph{no change},
-45.4\% \emph{change}). Working this way, the specialist ran five
-iterations of the click-train-predict loop; the convergence pattern
-across those iterations is described next.
+practitioner would: no budget of clicks per tile was imposed, no
+target number of iterations was set in advance, and no validation
+or test tiles were held out. The session was a production
+annotation effort rather than a controlled experiment, so every
+labeled tile feeds training, which is how the loop runs in real
+use. In total, 1999 of the 2000 tiles received at least one point
+and 143{,}634 points were placed, with a median of 43 points per
+tile (min 3, max 702) and an approximately balanced class split
+(54.6\% \emph{no change}, 45.4\% \emph{change}). These points
+cover 0.007\% of the roughly $2.1\times10^{9}$ pixels in the
+session, about one labeled pixel in every 14{,}600. Working this
+way, the expert ran five iterations of the click-train-predict
+loop, and the convergence pattern across those iterations is
+described next.
 
 % -------------------------------------------------------------
 % 5.2 Convergence across iterations
@@ -121,13 +127,18 @@ dominated by standing forest without recent change.
 
 The four cases are qualitatively coherent with the input: the
 predicted change footprint tracks the observable T1-to-T2
-difference; edges of large clearings are traced without leaking
-into standing forest; the fragmented case retains the vegetation
-islands rather than filling them. Visual inspection is not a
-substitute for a quantitative comparison with dense supervision or
-with PRODES polygons, and we do not claim otherwise here. What the
-qualitative panel does establish is that a working session run
-through the iSAGE-CD tool, with the protocol described in
-Section~\ref{sec:overview} onward, produces per-tile predictions
-that a domain expert can inspect and act upon --- the operational
-output that the method was designed to deliver.
+difference, edges of large clearings are traced without leaking
+into standing forest, and the fragmented case retains the
+vegetation islands rather than filling them. This inspection is
+also how the session ended. There is no held-out metric to
+optimize, and the loop stops when the expert, reviewing the
+predictions of the current round, is satisfied that the dataset
+supports its intended use. That point was reached at v5. Visual
+inspection is not a substitute for a quantitative comparison with
+dense supervision or with PRODES polygons, and we do not claim
+otherwise here. What the qualitative panel does establish is that
+a working session run through the iSAGE-CD tool, with the protocol
+described in Section~\ref{sec:overview} onward, produces per-tile
+predictions that a domain expert can inspect and accept, and that
+acceptance is the operational output the method is designed to
+deliver.
