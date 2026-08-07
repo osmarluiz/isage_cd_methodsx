@@ -1,1 +1,133 @@
-% TODO: draft 05_method_validation
+% =============================================================
+% METHOD VALIDATION — the Amazon case
+% =============================================================
+
+% -------------------------------------------------------------
+% 5.1 The Amazon session
+% -------------------------------------------------------------
+\subsection{The Amazon session}
+\label{sec:val_session}
+
+We validated iSAGE-CD by running a working annotation session over
+a scene of the Brazilian Amazon in the region of the deforestation
+arc. The imagery is PlanetScope surface reflectance in four bands
+(blue, green, red, near infrared) at 3\,m ground sample distance;
+the scene is diced into 2000 tiles of $1024 \times 1024$ pixels.
+Two class indices are used: \emph{no change} and \emph{change}
+(deforestation between the two dates), consistent with the binary
+supervision that the PRODES~\cite{prodes} deforestation product
+provides at the polygon level.
+
+The session comprises two annotation blocks, both covering the
+PRODES 2022 monitoring window (Aug 2021 -- Jul 2022). Block~A uses
+a Jun 2021 -- Jun 2022 image pair and holds tiles
+\texttt{0000-0999}; Block~B uses the calendar-aligned Aug 2021 --
+Jul 2022 pair and holds tiles \texttt{1000-1999}. The two blocks
+share no tiles (a spatial offset separates them), but they
+annotate the same event year with different reference-date
+choices. This configuration is not a temporal-generalization
+test; it reflects the operational sequence in which the session
+was actually built, and the two blocks together provided the pool
+from which the training iterations were carried out.
+
+Annotation was performed by a single expert working the tool as a
+practitioner would --- no budget of clicks per tile was imposed and
+no target number of iterations was set in advance. In total, 1999
+of the 2000 tiles received at least one point; 143{,}634 points
+were placed, with a median of 43 points per tile (min 3, max 702)
+and an approximately balanced class split (54.6\% \emph{no change},
+45.4\% \emph{change}). Working this way, the specialist ran five
+iterations of the click-train-predict loop; the convergence pattern
+across those iterations is described next.
+
+% -------------------------------------------------------------
+% 5.2 Convergence across iterations
+% -------------------------------------------------------------
+\subsection{Convergence across iterations}
+\label{sec:val_convergence}
+
+Figure~\ref{fig:convergence} shows the training loss over all five
+iterations, plotted against cumulative epoch. Each iteration is
+trained until the loss plateaus (150 epochs by default, except the
+short warm-start of round v2). The best per-iteration loss falls
+from 0.0134 in v1 to a similar 0.0153 in v5; the intermediate v2
+warm-start attained the lowest observed value (0.0086) on the
+subset of tiles already annotated at that point.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/fig_convergence.pdf}
+  \caption{Training loss across the five iterations of the Amazon
+    session, on a logarithmic scale. Colours identify iterations;
+    dotted vertical lines mark iteration boundaries. Each iteration
+    resumes from the previous best model, but the loss visibly
+    jumps up whenever new points are folded in (most clearly at
+    the boundaries of v3 and v5) and is then driven back to the
+    $\sim\!10^{-2}$ regime by continued training. The best-loss
+    epoch of each round is highlighted.}
+  \label{fig:convergence}
+\end{figure}
+
+Two features of the curve are worth noting because they reflect
+how the iSAGE loop is meant to work rather than any peculiarity of
+our dataset. First, the loss does not decrease monotonically across
+iterations: each round adds points, and every new point that the
+model was previously wrong about increases the loss transiently
+before training absorbs it. The spikes at the beginnings of v3 and
+v5 are the visible signature of this: v3 added the second half of
+Block~A and v5 introduced Block~B. Second, the plateau value that
+each iteration reaches is remarkably stable
+($\approx\!10^{-2}$ across all five), which is consistent with the
+iSAGE observation that a small number of error-focused clicks per
+round is enough to close most of the gap to dense supervision. We
+do not compare against a dense-supervision baseline here; a
+rigorous quantitative evaluation is the subject of a separate
+manuscript in preparation.
+
+% -------------------------------------------------------------
+% 5.3 Qualitative examples
+% -------------------------------------------------------------
+\subsection{Qualitative examples}
+\label{sec:val_qualitative}
+
+Beyond the loss curve, the most direct check of the method is
+whether the resulting per-tile predictions are of usable quality.
+Figure~\ref{fig:qualitative} shows four representative tiles from
+Block~B (Aug 2021 -- Jul 2022 pair). Each row contains, from left
+to right, the before image, the after image, the sparse
+annotations placed by the expert, and the v5 prediction overlaid
+on the after image. The tiles were chosen to span the recurring
+patterns of the arc of deforestation: a large consolidated
+clearing, a fragmented clearing with edges and remnant vegetation
+islands, an intrusion along an unpaved road, and a control tile
+dominated by standing forest without recent change.
+
+\begin{figure}[!h]
+  \centering
+  \fbox{\parbox{0.9\linewidth}{\centering
+    \vspace{2cm}
+    \emph{[Figure~\ref{fig:qualitative}: 4 rows $\times$ 4 columns
+    --- before / after / points / v5 prediction --- for four
+    representative Block-B tiles.]}
+    \vspace{2cm}
+  }}
+  \caption{Representative tiles from Block~B. Columns: PlanetScope
+    T1 (Aug 2021), PlanetScope T2 (Jul 2022), sparse annotations
+    placed via iSAGE-CD (red $=$ change, green $=$ no change), and
+    the v5 model prediction (translucent red overlay $=$ predicted
+    change) on the T2 image.}
+  \label{fig:qualitative}
+\end{figure}
+
+The four cases are qualitatively coherent with the input: the
+predicted change footprint tracks the observable T1-to-T2
+difference; edges of large clearings are traced without leaking
+into standing forest; the fragmented case retains the vegetation
+islands rather than filling them. Visual inspection is not a
+substitute for a quantitative comparison with dense supervision or
+with PRODES polygons, and we do not claim otherwise here. What the
+qualitative panel does establish is that a working session run
+through the iSAGE-CD tool, with the protocol described in
+Section~\ref{sec:overview} onward, produces per-tile predictions
+that a domain expert can inspect and act upon --- the operational
+output that the method was designed to deliver.
