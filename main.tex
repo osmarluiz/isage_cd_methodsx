@@ -33,20 +33,32 @@
                 country={Brazil}}
 
 \begin{abstract}
-% [~300 words placeholder]
-Change detection in remote sensing requires per-pixel labels on two
-co-registered dates, a cost that scales poorly with area and event
-frequency. iSAGE has shown that, in single-image semantic segmentation,
-expert clicks targeting confident model errors recover dense supervision
-quality at a fraction of a percent of the pixel budget. We extend that
-philosophy to the bi-temporal case with iSAGE-CD: a session format,
-annotation UI, and iteration protocol whose fundamental unit is the
-\emph{pair} rather than the image. Labels are anchored to a
-(reference, frame) pair, two synchronized canvases enforce a shared pixel
-grid, and the annotation tree \emph{is} the dataset -- no separate export.
-We describe the method and apply it to Amazon deforestation using Planet
-imagery aligned to the PRODES 2022 calendar. Code is released under CC BY 4.0
-at \url{https://github.com/osmarluiz/isage_cd}.
+Supervised change detection in remote sensing requires per-pixel
+labels on two co-registered dates, and producing them is the main
+cost of building a training dataset.
+iSAGE recently showed that, for single-image semantic segmentation,
+expert clicks placed on the model's confident mistakes recover most
+of the quality of dense labeling, but the framework does not model
+the bi-temporal case where a label is anchored to a pair of dates.
+We introduce iSAGE-CD, an extension of iSAGE to change detection
+built around three design choices: labels are anchored to a
+(reference, frame) pair rather than to a single image; the
+annotator shows two synchronized canvases so that a click on
+either date lands the point on both; and the annotation tree is
+the dataset itself, with no separate export step.
+We validate the tool on a working annotation session over a scene
+of the Brazilian Amazon covering the PRODES 2022 window
+(Aug 2021 -- Jul 2022): 2000 tiles of PlanetScope imagery labeled
+by a single expert who ran five iterations of the
+click-train-predict loop.
+The training loss converges to a stable regime across all
+iterations, and the resulting per-tile predictions are
+qualitatively coherent with the observable change on
+representative tiles.
+Full quantitative evaluation against dense supervision and PRODES
+is the subject of a separate manuscript in preparation.
+iSAGE-CD is released under CC BY 4.0 at
+\url{https://github.com/osmarluiz/isage_cd}.
 \end{abstract}
 
 \begin{keyword}
