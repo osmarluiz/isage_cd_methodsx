@@ -21,46 +21,16 @@
 ]
 
 % ================================================================
-% PANEL A — Interaction (dual-canvas UI)
+% PANEL A — Interaction (real screenshot of the iSAGE-CD annotator)
 % ================================================================
-\node[panel, minimum width=5.6cm] (A) at (0,0) {};
+\node[panel, minimum width=8.8cm, minimum height=6.4cm] (A) at (0,0) {%
+  \includegraphics[width=8.2cm]{figures/screenshot_ui.png}%
+};
 \node[panellabel, above=1pt of A.north west, anchor=south west]
      {A.\ Interaction};
 
-% Reference selector at top of panel
-\node[font=\scriptsize] at ($(A.north) + (0, -0.5)$)
-     {$\blacktriangleleft$~\texttt{antes\_202108}~$\blacktriangleright$};
-
-% The two co-registered canvases (bigger, spread more)
-\node[canvas] (before) at ($(A.center) + (-1.30, 0.25)$) {};
-\node[canvas] (after)  at ($(A.center) + (+1.30, 0.25)$) {};
-
-% Simulated "cleared area" patches (same relative position on both)
-\fill[orange!45] ($(before.south west) + (0.30, 0.35)$)
-                  rectangle ++(1.10, 0.85);
-\fill[orange!45] ($(before.south west) + (1.55, 1.35)$)
-                  rectangle ++(0.40, 0.40);
-\fill[orange!45] ($(after.south west)  + (0.30, 0.35)$)
-                  rectangle ++(1.30, 1.05);
-\fill[orange!45] ($(after.south west)  + (1.55, 1.35)$)
-                  rectangle ++(0.50, 0.50);
-
-% Three points, same relative offset on both canvases (co-registered clicks)
-\foreach \dx/\dy/\c in {%
-   0.40/0.45/red!85,
-  -0.55/-0.30/green!55!black,
-   0.60/-0.60/red!85%
-}{
-  \node[pt, fill=\c] at ($(before.center) + (\dx,\dy)$) {};
-  \node[pt, fill=\c] at ($(after.center)  + (\dx,\dy)$) {};
-}
-
-% Labels below each canvas
-\node[below=1pt of before, font=\scriptsize] {\textsc{reference}};
-\node[below=1pt of after,  font=\scriptsize] {\textsc{frame}};
-
 % Bottom caption
-\node[caption] at ($(A.south) + (0, 0.35)$)
+\node[caption] at ($(A.south) + (0, 0.25)$)
      {clicks are co-registered on both canvases};
 
 % ================================================================
