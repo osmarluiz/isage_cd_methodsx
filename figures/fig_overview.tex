@@ -1,43 +1,38 @@
 % =============================================================
 % Figure 1 (fig:overview) — iSAGE-CD pipeline diagram
-% Three-panel layout: A. Interaction | B. Data | C. Training loop
+% Layout: A on top (full width) ; B and C side-by-side below.
 % =============================================================
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
   font=\sffamily\footnotesize,
   panel/.style={draw=black!40, rounded corners=3pt,
-                inner sep=10pt, minimum height=6.4cm},
-  canvas/.style={draw=black, thick,
-                 minimum width=2.2cm, minimum height=2.2cm,
-                 fill=green!15},
+                inner sep=8pt},
   loopbox/.style={draw=black!50, rounded corners=2pt,
-                  minimum width=2.5cm, minimum height=0.8cm,
+                  minimum width=2.6cm, minimum height=0.8cm,
                   fill=gray!5, align=center, inner sep=2pt},
   arr/.style={-{Latex[length=2mm]}, thick},
-  pt/.style={circle, minimum size=5pt, inner sep=0pt,
-             draw=black!70, line width=0.3pt},
   panellabel/.style={font=\bfseries},
   caption/.style={font=\scriptsize\itshape},
 ]
 
 % ================================================================
-% PANEL A — Interaction (real screenshot of the iSAGE-CD annotator)
+% PANEL A — Interaction (real screenshot, full width on top)
 % ================================================================
-\node[panel, minimum width=8.8cm, minimum height=6.4cm] (A) at (0,0) {%
-  \includegraphics[width=8.2cm]{figures/screenshot_ui.png}%
+\node[panel] (A) at (0, 0) {%
+  \includegraphics[width=15.4cm]{figures/screenshot_ui.png}%
 };
 \node[panellabel, above=1pt of A.north west, anchor=south west]
      {A.\ Interaction};
-
-% Bottom caption
-\node[caption] at ($(A.south) + (0, 0.25)$)
-     {clicks are co-registered on both canvases};
+\node[caption, below=1pt of A.south] (Acap)
+     {\ isage-cd annotator on the Amazon session
+      (\textsc{before} Jun~2021, \textsc{after} Jun~2022);
+      clicks are co-registered on both canvases};
 
 % ================================================================
-% PANEL B — Data (annotation tree == dataset)
-% Uses proper unicode box-drawing chars: ├ ─ │ └
+% PANEL B — Data (annotation tree == dataset), bottom-left
 % ================================================================
-\node[panel, minimum width=5.6cm, right=8mm of A] (B) {};
+\node[panel, minimum width=7.4cm, minimum height=6.2cm,
+      below=8mm of A.south west, anchor=north west] (B) {};
 \node[panellabel, above=1pt of B.north west, anchor=south west]
      {B.\ Data};
 
@@ -55,34 +50,33 @@ Sessions/Amazon/\\
 └── iteration\_1/~\dots%
 };
 
-\node[caption] at ($(B.south) + (0, 0.35)$)
+\node[caption] at ($(B.south) + (0, 0.30)$)
      {annotation tree $=$ training dataset};
 
 % ================================================================
-% PANEL C — Training (iterative click loop, spaced out)
+% PANEL C — Training (iterative click loop), bottom-right
 % ================================================================
-\node[panel, minimum width=4.0cm, right=8mm of B] (C) {};
+\node[panel, minimum width=7.4cm, minimum height=6.2cm,
+      below=8mm of A.south east, anchor=north east] (C) {};
 \node[panellabel, above=1pt of C.north west, anchor=south west]
      {C.\ Training};
 
-% Boxes spaced ~1.35cm apart, filling the panel vertically
-\node[loopbox] (an) at ($(C.center) + (0.30,  2.05)$)
+\node[loopbox] (an) at ($(C.center) + (0,  2.05)$)
      {annotate\\{\tiny clicks on pair}};
-\node[loopbox] (tr) at ($(C.center) + (0.30,  0.70)$)
+\node[loopbox] (tr) at ($(C.center) + (0,  0.70)$)
      {train\\{\tiny error-weighted}};
-\node[loopbox] (pr) at ($(C.center) + (0.30, -0.70)$)
+\node[loopbox] (pr) at ($(C.center) + (0, -0.70)$)
      {predict\\{\tiny per pair}};
-\node[loopbox] (re) at ($(C.center) + (0.30, -2.05)$)
+\node[loopbox] (re) at ($(C.center) + (0, -2.05)$)
      {review\\{\tiny model errors}};
 
 \draw[arr] (an) -- (tr);
 \draw[arr] (tr) -- (pr);
 \draw[arr] (pr) -- (re);
-
-% Smoother loop-back arrow: wider curve around the outside-left
+% Smooth loop-back around the outside-left
 \draw[arr] (re.west) to[out=180, in=180, looseness=2.4] (an.west);
 
-\node[caption] at ($(C.south) + (0, 0.35)$)
+\node[caption] at ($(C.south) + (0, 0.30)$)
      {iSAGE loop, unchanged};
 
 \end{tikzpicture}%
