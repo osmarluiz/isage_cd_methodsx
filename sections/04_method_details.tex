@@ -86,36 +86,240 @@ displayed. Section~\ref{sec:exchange} describes round-based data
 exchange between annotators.
 
 % -------------------------------------------------------------
-% 4.2 Session structure and initialization  (TODO)
+% 4.2 Session structure and initialization
 % -------------------------------------------------------------
 \subsection{Session structure and initialization}
 \label{sec:session_structure}
-% TODO
+
+The Overview showed that the annotation tree \emph{is} the dataset.
+This subsection specifies the tree. A session lives in a single
+directory that contains the images, the class configuration, the
+per-iteration annotations, and the training artefacts:
+
+\begin{verbatim}
+Sessions/Amazon/
++-- config/
+|   +-- session_config.json     current_iteration
+|   +-- dataset_metadata.json   classes, colors, ignore_index
++-- data/dataset/train/
+|   +-- images/                 frames (one PNG per frame)
+|   +-- images_before/          references (one folder per frame)
+|   +-- pair_meta/              per-frame metadata (date_after, ...)
++-- iteration_0/
+|   +-- annotations/            one folder per frame, JSON per pair
+|   +-- predictions/            per-frame prediction PNGs
+|   +-- models/                 trained checkpoints
+|   +-- masks/                  optional dense masks
++-- iteration_1/
++-- ...
+\end{verbatim}
+
+Two configuration files sit under \texttt{config/}. The first,
+\texttt{session\_config.json}, holds a single field
+(\texttt{current\_iteration}) that names the iteration the user is
+currently annotating. The second,
+\texttt{dataset\_metadata.json}, declares the classes: how many
+there are, which index means ``unlabeled'', and, for each class, a
+human-readable name and a display colour. This declaration is the
+one authority on class semantics; the interface, the label files,
+and the prediction overlays all read from it.
+
+A session is built by a helper script that takes a folder of
+co-registered image pairs and a class definition and writes the
+directory tree above. The input folder has one subfolder per frame:
+
+\begin{verbatim}
+entrada/
++-- 0000/
+|   +-- depois.png             the fixed image
+|   +-- antes_202106.png       one or more references
+|   +-- antes_202108.png       (label = YYYYMM)
++-- 0001/ ...
+\end{verbatim}
+
+The classes file is a short JSON list, one entry per class, in
+index order:
+
+\begin{verbatim}
+[{"name": "No change", "color": "#2e8b3d"},
+ {"name": "Change",    "color": "#e5194b"}]
+\end{verbatim}
+
+The build command is a single call:
+
+\begin{verbatim}
+python tools/build_session.py entrada/ \
+    --classes classes.json --out Sessions/Amazon
+\end{verbatim}
+
+The script copies each \texttt{depois.png} into
+\texttt{images/<frame>.png}, each \texttt{antes\_YYYYMM.png} into
+\texttt{images\_before/<frame>/}, writes the two config files, and
+creates an empty \texttt{iteration\_0/} with the four subfolders.
+The session is ready to open.
 
 % -------------------------------------------------------------
-% 4.3 Bi-temporal annotation interface  (TODO)
+% 4.3 Bi-temporal annotation interface
 % -------------------------------------------------------------
 \subsection{Bi-temporal annotation interface}
 \label{sec:ui}
-% TODO
+
+With the session on disk, the annotator opens it and presents the
+interface shown in Figure~\ref{fig:overview}A. The layout is
+symmetric: the reference canvas on the left, the frame canvas on
+the right. Both canvases display the same pixel grid, and every
+view operation --- zoom, pan, and the placement of points --- is
+mirrored between them. A click on either side lands the point at
+the same pixel on both.
+
+Above the reference canvas sits a compact reference selector: a
+dropdown listing every available reference for the current frame,
+flanked by \texttt{$\blacktriangleleft$} and
+\texttt{$\blacktriangleright$} buttons for step-through navigation
+(the shortcuts \texttt{,} and \texttt{.} do the same). References
+that already carry annotations are marked with a bullet in the
+dropdown; switching the reference switches the whole point set
+displayed on both canvases, so the user is always looking at the
+labels for one specific pair.
+
+The right-hand status panel exposes three counters, updated live as
+the user works: \textsc{total} for the whole session,
+\textsc{image} for the current frame across all its references, and
+\textsc{this pair} for the pair on screen. A line below the
+counters reports the number of pairs in the current frame that
+already carry points --- useful to know when a frame has been
+partially annotated against some references but not others. A
+mini-map above the counters shows the current viewport as a
+rectangle over a down-scaled copy of the frame.
+
+Interaction with the canvases follows a small vocabulary. A left
+click adds a point with the currently selected class; a right click
+near an existing point removes it; a middle-mouse drag pans the
+view; the mouse wheel zooms. Points can be dragged to fine-tune
+their position. The colour of each point comes from the class
+palette declared in \texttt{dataset\_metadata.json}, so the
+interface, the label files, and the prediction overlays share a
+single visual language.
 
 % -------------------------------------------------------------
-% 4.4 Pair-anchored label format  (TODO)
+% 4.4 Pair-anchored label format
 % -------------------------------------------------------------
 \subsection{Pair-anchored label format}
 \label{sec:label_format}
-% TODO
+
+Every click placed through the interface lands in a per-pair JSON
+file. The path is fully determined by the pair: for a click on
+frame \texttt{0000} against reference \texttt{202106} at iteration
+\texttt{5}, the file is
+\texttt{iteration\_5/annotations/0000/202106.json}. The file
+contains only what is needed to reconstruct that pair as a training
+sample:
+
+\begin{verbatim}
+{
+  "format_version": "2.1-pair",
+  "image": {"name": "0000.png",
+            "width": 1024, "height": 1024},
+  "iteration": 5,
+  "created_at": "2026-08-06T15:30:00Z",
+  "pair": {
+    "frame": "0000",
+    "month_before": "202106",
+    "date_after": "2022-06"
+  },
+  "annotations": [
+    [268, 339, 1],
+    [512, 480, 0],
+    [745, 621, 1]
+  ]
+}
+\end{verbatim}
+
+The \texttt{pair} block names the frame and the reference and
+carries the date of the frame image; the \texttt{annotations} list
+holds the points as \texttt{[x, y, class]} triples in pixel
+coordinates. Every write is atomic: the annotator serialises the
+JSON to a temporary file and only then renames it into place, so a
+crash mid-write cannot leave a half-written file on disk. A pair
+whose point set becomes empty during editing has its file removed;
+the containing frame folder is removed when its last pair goes
+away. There is no separate ``dirty'' state to reconcile: the file
+tree is always a faithful representation of the current annotation.
+
+Because each JSON is one training sample, downstream pipelines can
+consume the annotation tree directly, and constructing a
+leakage-free train/validation split reduces to selecting a subset
+of frame folders. All pairs of a given frame live in the same
+folder, so no split can accidentally place two references of the
+same scene on different sides of the partition.
 
 % -------------------------------------------------------------
-% 4.5 Iteration workflow and predictions  (TODO)
+% 4.5 Iteration workflow and predictions
 % -------------------------------------------------------------
 \subsection{Iteration workflow and predictions}
 \label{sec:iteration}
-% TODO
+
+The pair-anchored label files described above feed the training
+loop. Each round of activity is stored in a numbered
+\texttt{iteration\_N/} subfolder that mirrors the same shape:
+\texttt{annotations/} for the points collected in that round,
+\texttt{models/} for the trained checkpoints, \texttt{predictions/}
+for the per-frame prediction PNGs, and an optional \texttt{masks/}
+for dense masks derived from the sparse points. The
+\texttt{current\_iteration} field in \texttt{session\_config.json}
+names the iteration the user is currently annotating.
+
+The prediction overlay in the interface follows a simple
+convention: the predictions displayed on the frame come from
+\texttt{iteration\_\{N-1\}/predictions/<frame>.png}, where
+\texttt{N} is the current iteration. In other words, the user
+always sees the output of the model trained in the previous round
+while annotating the next round --- exactly the surface the iSAGE
+error-focused click strategy needs. Iteration 0 has no previous
+round, so no overlay is loaded; from iteration 1 onward the
+overlay is available.
+
+Prediction PNGs use class-index values: a pixel with value
+\texttt{0} is background, \texttt{1} is the first foreground class,
+and so on, up to \texttt{num\_classes - 1}. This matches the class
+indices declared in \texttt{dataset\_metadata.json}, so the
+overlay is coloured with the same palette as the point classes:
+what the user clicked and what the model predicts share a visual
+language. The overlay opacity is adjustable through the control
+panel; the toggle key \texttt{P} shows the overlay while held.
+
+A new iteration is created after training completes. The training
+script writes \texttt{iteration\_\{N\}/predictions/} and
+\texttt{iteration\_\{N\}/models/}, creates an empty
+\texttt{iteration\_\{N+1\}/annotations/} folder, and increments
+\texttt{current\_iteration}. The next session re-opens on the new
+iteration with the fresh predictions already visible as the
+overlay --- ready for the next round of error-focused clicks.
 
 % -------------------------------------------------------------
-% 4.6 Round-trip data exchange  (TODO)
+% 4.6 Round-trip data exchange
 % -------------------------------------------------------------
 \subsection{Round-trip data exchange}
 \label{sec:exchange}
-% TODO
+
+Because the annotation tree is the dataset, sharing a round of
+work between annotators reduces to sharing the annotation subtree
+of an iteration. The tool provides two commands for this:
+
+\begin{verbatim}
+python anotar.py --exportar
+python anotar.py --importar rotulos.zip
+\end{verbatim}
+
+The first packages the JSONs of the current iteration into a
+timestamped zip under \texttt{envio/} and opens the containing
+folder; the file can be sent through any channel. The second
+merges the JSONs from a received zip into the corresponding
+iteration folder of the local session. Pairs that were not present
+locally are added; pairs that were already present are overwritten
+with the incoming version, which is the simplest and least
+surprising merge rule. In a typical two-person workflow one
+annotator finishes a round, exports the zip, and hands it to a
+reviewer, who imports it, revises the points, and either exports
+back or triggers a new training round.
+
