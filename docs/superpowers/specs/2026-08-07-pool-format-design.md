@@ -31,7 +31,8 @@ Isso puxa **uma** mudança de software no `isage_cd` (público):
   nomes de arquivo.
 - Par = qualquer `(antes, depois)` com `antes < depois` (ordem
   lexicográfica = cronológica).
-- Anotação: `iteration_N/annotations/<cena>/<antes>_<depois>.json`,
+- Anotação: `iteration_N/annotations/<cena>/<antes>_<depois>.json`
+  (separador `_`, ex. `202106_202206.json`),
   `format_version: "3.0-pool"`, bloco
   `pair: {scene, date_before, date_after}`, pontos `[x, y, class]`.
 - Escrita atômica (temp + rename) e remoção de arquivo/pasta vazios:
@@ -60,10 +61,8 @@ Isso puxa **uma** mudança de software no `isage_cd` (público):
   - JSONs `annotations/<cena>/<antes>.json` →
     `<cena>/<antes>_<date_after>.json`;
   - `predictions/<cena>.png` → `predictions/<cena>/<antes>_<depois>.png`
-    do par correspondente. **Ponto aberto:** a predição antiga é por
-    frame; se algum frame tiver mais de uma referência anotada, a
-    atribuição do par é ambígua. Resolvido pela resposta do handoff
-    (se a sessão Amazon usa uma referência por frame, mapeia direto);
+    do par correspondente. (Resolvido via handoff: a sessão Amazon tem
+    sempre 1 referência por frame, então o mapeamento é direto.);
   - atualiza `session_config.json` / `dataset_metadata.json`.
   - O anotador entende SÓ o formato novo (sem caminho de código legado).
 - `--exportar` / `--importar`: inalterados (só carregam nomes novos).
@@ -83,13 +82,22 @@ Isso puxa **uma** mudança de software no `isage_cd` (público):
 
 ## E. Consequências na validação (seção 05)
 
-- A sessão Amazon (em outra máquina) precisa ser migrada com
-  `migrate_session.py`.
-- O screenshot da UI (Fig 1A) precisa ser regerado com os dois
-  seletores de data visíveis.
-- Dados da sessão real chegam via handoff no próprio repo
-  (`handoff/`) — ver perguntas em
-  `handoff/2026-08-07-perguntas-sessao-amazon.md`.
+- A Method Validation ancora na **sessão real** (2000 tiles, 5
+  iterações, 143.634 pontos, dois blocos de datas: A =
+  2021-06→2022-06 em 0000-0999, B = 2021-08→2022-07 em 1000-1999).
+  Referência técnica completa:
+  `handoff/2026-08-07-sessao-real-referencia.md`.
+- A conversão da sessão real (formato v1.0 → 3.0-pool) é feita por
+  script sessão-específico na máquina de anotação, seguindo o §3 da
+  referência; o `migrate_session.py` público cobre só 2.1-pair →
+  3.0-pool (divisão registrada em
+  `handoff/2026-08-07-respostas-do-paper.md`).
+- Trainer/predict de referência a citar no Method Details:
+  `github.com/osmarluiz/amazon-deforestation-cd` (Unet +
+  EfficientNet-B7, loss error-weighted `DWCBCELossSimple`, sliding
+  window 1024/stride 512).
+- O screenshot da UI (Fig 1A) será regerado na máquina de anotação
+  com os dois seletores de data visíveis, sobre a sessão real migrada.
 
 ## Fora de escopo
 
