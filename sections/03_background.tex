@@ -21,16 +21,19 @@ with a small set of clicks, keeping the human effort per sample low
 while still letting the model see where it is right and where it is
 wrong.
 
-iSAGE~\cite{isage} is a recent point-based, human-in-the-loop
-framework for remote-sensing semantic segmentation. It showed that an
-expert who clicks only on the model's confident mistakes can recover
-most of the quality of dense labeling. On the BsB Aerial dataset,
-iSAGE reached 97.2\% of the dense mIoU using 0.040\% of the pixels.
-On ISPRS Vaihingen it matched the dense baseline (76.78\% versus
-76.65\% mIoU) with 0.011\% of the pixels. The mechanism is small: an
-error-weighted loss amplifies the gradient at each click. There are
-no pseudo-labels, no conditional random fields, no foundation-model
-prompts. The annotation record is the dataset.
+iSAGE~\cite{isage} (\emph{Iterative Sparse Annotation Guided by
+Expert}) is a recent point-based, human-in-the-loop framework for
+remote-sensing semantic segmentation. It showed that an expert who
+clicks only on the model's confident mistakes can recover most of
+the quality of dense labeling. On the BsB Aerial dataset, iSAGE
+reached 97.2\% of the dense mIoU using 0.040\% of the pixels. On
+ISPRS Vaihingen it matched the dense baseline (76.78\% versus
+76.65\% mIoU) with 0.011\% of the pixels. The mechanism is small:
+an error-weighted loss amplifies the gradient at each click. There are no pseudo-labels, no conditional random
+fields, no foundation-model prompts. Just as important as the
+loss, iSAGE argues that testing this idea in isolation requires
+annotation, training, and data management to live in a single
+integrated environment. The annotation record is the dataset.
 
 Change detection is another core remote-sensing task with the same
 labeling problem. Instead of classifying pixels in a single image,
