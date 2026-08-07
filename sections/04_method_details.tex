@@ -261,13 +261,29 @@ same scene on different sides of the partition.
 
 The pair-anchored label files described above feed the training
 loop. Each round of activity is stored in a numbered
-\texttt{iteration\_N/} subfolder that mirrors the same shape:
-\texttt{annotations/} for the points collected in that round,
-\texttt{models/} for the trained checkpoints, \texttt{predictions/}
-for the per-frame prediction PNGs, and an optional \texttt{masks/}
-for dense masks derived from the sparse points. The
+\texttt{iteration\_N/} subfolder with a small, fixed structure
+(Table~\ref{tab:iteration_folder}); the
 \texttt{current\_iteration} field in \texttt{session\_config.json}
 names the iteration the user is currently annotating.
+
+\begin{table}[!h]
+\centering
+\small
+\caption{Contents of a single \texttt{iteration\_N/} folder. Each
+subfolder has a single producer and a single consumer; together
+they close the annotate/train/predict/review loop.}
+\label{tab:iteration_folder}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Subfolder            & Produced by                        & Consumed by \\
+\midrule
+\texttt{annotations/} & user clicks during round $N$      & training script at end of round $N$ \\
+\texttt{models/}      & training script                   & prediction script \\
+\texttt{predictions/} & prediction script                 & overlay shown in round $N{+}1$ \\
+\texttt{masks/}       & (optional; dense mask utilities)  & external evaluation \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The prediction overlay in the interface follows a simple
 convention: the predictions displayed on the frame come from
