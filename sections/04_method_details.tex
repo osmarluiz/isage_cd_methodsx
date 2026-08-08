@@ -159,42 +159,23 @@ scene on different sides of the partition.
 \subsection{Bi-temporal annotation interface}
 \label{sec:ui}
 
-With the session on disk, the annotator opens it and presents the
-interface shown in Figure~\ref{fig:overview}A. The layout is
-symmetric: the reference canvas on the left, the frame canvas on
-the right. Both canvases display the same pixel grid, and every
-view operation --- zoom, pan, and the placement of points --- is
-mirrored between them. A click on either side lands the point at
-the same pixel on both.
+Opening a session presents two synchronized canvases
+(Figure~\ref{fig:overview}a), before on the left, after on the
+right. Zoom, pan, and points are mirrored between them, and a click
+on either side lands the point at the same pixel on both.
 
-Above the reference canvas sits a compact reference selector: a
-dropdown listing every available reference for the current frame,
-flanked by \texttt{$\blacktriangleleft$} and
-\texttt{$\blacktriangleright$} buttons for step-through navigation
-(the shortcuts \texttt{,} and \texttt{.} do the same). References
-that already carry annotations are marked with a bullet in the
-dropdown; switching the reference switches the whole point set
-displayed on both canvases, so the user is always looking at the
-labels for one specific pair.
+Labeling takes few gestures: a left click adds a point with the
+selected class, a right click near a point removes it, a drag
+fine-tunes its position, the wheel zooms, a middle-mouse drag pans.
+Point colours follow the class palette declared in
+\texttt{dataset\_metadata.json}.
 
-The right-hand status panel exposes three counters, updated live as
-the user works: \textsc{total} for the whole session,
-\textsc{image} for the current frame across all its references, and
-\textsc{this pair} for the pair on screen. A line below the
-counters reports the number of pairs in the current frame that
-already carry points --- useful to know when a frame has been
-partially annotated against some references but not others. A
-mini-map above the counters shows the current viewport as a
-rectangle over a down-scaled copy of the frame.
-
-Interaction with the canvases follows a small vocabulary. A left
-click adds a point with the currently selected class; a right click
-near an existing point removes it; a middle-mouse drag pans the
-view; the mouse wheel zooms. Points can be dragged to fine-tune
-their position. The colour of each point comes from the class
-palette declared in \texttt{dataset\_metadata.json}, so the
-interface, the label files, and the prediction overlays share a
-single visual language.
+Each canvas has a date selector. The before selector offers only
+dates earlier than the current after date, so an invalid pair
+cannot be selected, and changing either date switches the point set
+on both canvases. Dates already annotated are marked with a bullet,
+a scene opens on its most recently annotated pair, and live
+counters track the session, the scene, and the pair on screen.
 
 % -------------------------------------------------------------
 % 4.5 Training in the loop
