@@ -106,25 +106,23 @@ grid.
 \subsection{Pair-anchored label format}
 \label{sec:label_format}
 
-Every click placed through the interface lands in a per-pair JSON
-file. The path is fully determined by the pair: for a click on
-frame \texttt{0000} against reference \texttt{202106} at iteration
-\texttt{5}, the file is
-\texttt{iteration\_5/annotations/0000/202106.json}. The file
-contains only what is needed to reconstruct that pair as a training
-sample:
+Every click lands in a JSON file that belongs to one pair. The path
+is fully determined by the pair: a click on scene \texttt{0000}
+with dates (\texttt{202106}, \texttt{202206}) at iteration
+\texttt{5} goes to
+\texttt{iteration\_5/annotations/0000/202106\_202206.json}:
 
 \begin{verbatim}
 {
-  "format_version": "2.1-pair",
-  "image": {"name": "0000.png",
+  "format_version": "3.0-pool",
+  "image": {"name": "0000/202206.png",
             "width": 1024, "height": 1024},
   "iteration": 5,
-  "created_at": "2026-08-06T15:30:00Z",
+  "created_at": "2026-08-07T15:30:00Z",
   "pair": {
-    "frame": "0000",
-    "month_before": "202106",
-    "date_after": "2022-06"
+    "scene": "0000",
+    "date_before": "202106",
+    "date_after": "202206"
   },
   "annotations": [
     [268, 339, 1],
@@ -134,23 +132,24 @@ sample:
 }
 \end{verbatim}
 
-The \texttt{pair} block names the frame and the reference and
-carries the date of the frame image; the \texttt{annotations} list
-holds the points as \texttt{[x, y, class]} triples in pixel
-coordinates. Every write is atomic: the annotator serialises the
-JSON to a temporary file and only then renames it into place, so a
-crash mid-write cannot leave a half-written file on disk. A pair
-whose point set becomes empty during editing has its file removed;
-the containing frame folder is removed when its last pair goes
-away. There is no separate ``dirty'' state to reconcile: the file
-tree is always a faithful representation of the current annotation.
+A point is an entry of \texttt{annotations}: pixel coordinates and
+a class index. Anchoring the file to the pair preserves the
+semantics of a change label. The same region can be change against
+one before date and no change against another, and each statement
+lives in its own file, so neither contaminates the other.
 
-Because each JSON is one training sample, downstream pipelines can
-consume the annotation tree directly, and constructing a
-leakage-free train/validation split reduces to selecting a subset
-of frame folders. All pairs of a given frame live in the same
-folder, so no split can accidentally place two references of the
-same scene on different sides of the partition.
+Every write is atomic: the annotator serialises the JSON to a
+temporary file and only then renames it into place, so a crash
+mid-write cannot leave a half-written file on disk. A pair whose
+point set becomes empty has its file removed, and the scene folder
+is removed with its last pair. The file tree is always a faithful
+representation of the current annotation.
+
+Each JSON is one training sample, so downstream pipelines consume
+the annotation tree directly, and a leakage-free train/validation
+split reduces to selecting scene folders. All pairs of a scene live
+in the same folder, so no split can place two pairs of the same
+scene on different sides of the partition.
 
 % -------------------------------------------------------------
 % 4.4 Bi-temporal annotation interface
