@@ -139,9 +139,10 @@ semantics of a change label. The same region can be change against
 one before date and no change against another, and each statement
 lives in its own file, so neither contaminates the other.
 
-Every write is atomic: the annotator serialises the JSON to a
-temporary file and only then renames it into place, so a crash
-mid-write cannot leave a half-written file on disk. A pair whose
+The file is rewritten at every click: there is no save button and
+no unsaved state. Every write is atomic: the annotator serialises
+the JSON to a temporary file and only then renames it into place,
+so a crash mid-write cannot leave a half-written file on disk. A pair whose
 point set becomes empty has its file removed, and the scene folder
 is removed with its last pair. The file tree is always a faithful
 representation of the current annotation.
