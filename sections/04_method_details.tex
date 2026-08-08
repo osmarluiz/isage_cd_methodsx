@@ -49,24 +49,29 @@ A session is a single directory that contains the images, the class
 configuration, the per-iteration annotations, and the training
 artefacts:
 
-\begin{verbatim}
-Sessions/CD/
-+-- config/
-|   +-- session_config.json     current_iteration, format
-|   +-- dataset_metadata.json   classes, colors, ignore_index
-+-- data/dataset/train/
-|   +-- <scene>/                one folder per scene
-|       +-- 202106.png          dated, co-registered images
-|       +-- 202108.png          (name = YYYYMM or YYYYMMDD)
-|       +-- 202206.png
-+-- iteration_0/
-|   +-- annotations/            one folder per scene, JSON per pair
-|   +-- predictions/            per-pair prediction PNGs
-|   +-- models/                 trained checkpoints
-|   +-- masks/                  optional dense masks
-+-- iteration_1/
-+-- ...
-\end{verbatim}
+\medskip
+\begingroup
+\renewcommand*\DTstyle{\ttfamily\small}
+\renewcommand*\DTcomment[1]{\hfill\textrm{\footnotesize\itshape #1}}
+\dirtree{%
+.1 Sessions/CD/.
+.2 config/.
+.3 session\_config.json\DTcomment{current\_iteration, format}.
+.3 dataset\_metadata.json\DTcomment{classes, colors, ignore\_index}.
+.2 data/dataset/train/.
+.3 {<scene>/}\DTcomment{one folder per scene}.
+.4 202106.png\DTcomment{dated, co-registered images}.
+.4 202108.png\DTcomment{name = YYYYMM or YYYYMMDD}.
+.4 202206.png.
+.2 iteration\_0/.
+.3 annotations/\DTcomment{one folder per scene, JSON per pair}.
+.3 predictions/\DTcomment{per-pair prediction PNGs}.
+.3 models/\DTcomment{trained checkpoints}.
+.3 masks/\DTcomment{optional dense masks}.
+.2 iteration\_1/ \ldots.
+}
+\endgroup
+\medskip
 
 Each scene folder is a pool of dates. The file name is the date, as
 a digit string whose lexicographic order is the chronological
