@@ -183,29 +183,15 @@ counters track the session, the scene, and the pair on screen.
 \subsection{Training in the loop}
 \label{sec:training}
 
-The training protocol is inherited from iSAGE without change. The
-user annotates points; the model is trained with an error-weighted
-loss that amplifies the gradient at each labeled pixel; the trained
-model produces per-pair predictions; the user reviews those
-predictions, focuses on the model's confident mistakes, and adds new
-points where the model is wrong. The loop repeats until the
-annotations stabilize. No pseudo-labels, conditional random fields,
-or foundation-model prompts are inserted between the clicks and the
-loss. What iSAGE-CD adds is in the representation of the pair, not
-in the training procedure.
-
-% -------------------------------------------------------------
-% 4.6 Iteration workflow and predictions
-% -------------------------------------------------------------
-\subsection{Iteration workflow and predictions}
-\label{sec:iteration}
-
-The pair-anchored label files described above feed the training
-loop. Each round of activity is stored in a numbered
-\texttt{iteration\_N/} subfolder with a small, fixed structure
-(Table~\ref{tab:iteration_folder}); the
-\texttt{current\_iteration} field in \texttt{session\_config.json}
-names the iteration the user is currently annotating.
+iSAGE-CD has no built-in trainer, by design. What the loop needs is
+a model in it, not a model inside the tool, and users of an
+annotation tool want to bring their own architecture. Training
+plugs in through a folder contract
+(Table~\ref{tab:iteration_folder}): a trainer reads the pair files
+of \texttt{iteration\_N/annotations/} and writes checkpoints to
+\texttt{models/} and per-pair prediction PNGs to
+\texttt{predictions/}. Anything that honours this contract closes
+the loop, whatever the framework or the architecture.
 
 \begin{table}[!h]
 \centering
@@ -225,6 +211,27 @@ Subfolder            & Produced by                        & Consumed by \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+The reference protocol is inherited from iSAGE~\cite{isage}. Each
+pair file is one training sample: the two images are stacked as
+input channels and the points are the sparse targets. The model is
+trained with an error-weighted loss that amplifies the gradient at
+each labeled pixel, and nothing is inserted between the clicks and
+the loss: no pseudo-labels, no conditional random fields, no
+foundation-model prompts. What iSAGE-CD adds is the representation
+of the pair, not the training procedure.
+
+% -------------------------------------------------------------
+% 4.6 Iteration workflow and predictions
+% -------------------------------------------------------------
+\subsection{Iteration workflow and predictions}
+\label{sec:iteration}
+
+Each round of activity is stored in a numbered
+\texttt{iteration\_N/} subfolder (Table~\ref{tab:iteration_folder}),
+and the \texttt{current\_iteration} field in
+\texttt{session\_config.json} names the iteration the user is
+currently annotating.
 
 The prediction overlay in the interface follows a simple
 convention: the predictions displayed on the frame come from
