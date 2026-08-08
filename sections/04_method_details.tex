@@ -8,22 +8,20 @@
 \subsection{Overview}
 \label{sec:overview}
 
-The iSAGE-CD annotator shows two co-registered images side by side.
-The user clicks on either canvas and a point appears at the same
-pixel on both. Zoom, pan, and points are shared between the two
-views. The workflow follows iSAGE: an expert clicks on the model's
-confident mistakes, the corrected labels feed the next training
-round. The unit of annotation is a pair of dates, not a single image.
+The iSAGE-CD annotator shows two co-registered images of the same
+place side by side. A click on either canvas lands a labeled point
+at the same pixel on both. The workflow follows iSAGE: the expert
+clicks on the model's confident mistakes, a model is trained on the
+accumulated points, its predictions return as an overlay, and the
+expert clicks again where the model is wrong. The loop repeats
+until the expert accepts the predictions by inspection.
 
-Three terms structure the rest of the description. A \emph{frame} is
-the fixed image of the event, typically the higher-resolution or
-post-event scene. A \emph{reference} is an image paired with the
-frame, typically the pre-event scene; a frame may have one reference
-(classic two-date change detection) or several (a monthly time
-series, for example). A \emph{pair} is a (reference, frame) tuple,
-and it is the unit of annotation and of training. Each pair keeps
-its own point set, and the same frame can be labeled against several
-references independently.
+Three terms structure the description. A scene is a folder of
+dated, co-registered images of one place. A pair is a choice of two
+of those dates (before, after), and it is the unit of annotation
+and of training: each pair keeps its own point set. A point is an
+$[x, y, \mathrm{class}]$ triple on the pixel grid that the two
+dates share.
 
 % ------------------------------------------------------------------
 % FIGURE 1 — high-level pipeline diagram (TikZ, first pass)
@@ -48,42 +46,18 @@ references independently.
   \label{fig:overview}
 \end{figure}
 
-Because the pair is the annotation unit, iSAGE-CD stores one file
-per pair. A frame with three references has three annotation files,
-each containing only the points that make sense in that pair.
-Switching the reference in the interface switches the point set on
-both canvases. This preserves the semantics of a change label: a
-cleared area may be labeled \emph{new} against one reference date
-and \emph{old} against another, and neither label contaminates the
-other.
-
-The directory that holds the images and the directory that holds the
-annotations are the same session. There is no export step: the
-annotation tree already has the layout of a training dataset. A
-held-out split reduces to selecting a subset of frame folders;
-nothing crosses between train and validation because pairs of the
-same frame all live in the same folder. This eliminates a class of
-subtle bugs where the same scene appears on both sides of a split.
-
-The training protocol is inherited from iSAGE without change. The
-user annotates points; the model is trained with an error-weighted
-loss that amplifies the gradient at each labeled pixel; the trained
-model produces per-pair predictions; the user reviews those
-predictions, focuses on the model's confident mistakes, and adds new
-points where the model is wrong. The loop repeats until the
-annotations stabilize. No pseudo-labels, conditional random fields,
-or foundation-model prompts are inserted between the clicks and the
-loss. What iSAGE-CD adds is in the representation of the pair, not
-in the training procedure.
-
-The remainder of this section makes each of these decisions concrete.
-Section~\ref{sec:session_structure} describes the session directory
-tree and how a session is initialized. Section~\ref{sec:ui} covers
-the bi-temporal annotation interface. Section~\ref{sec:label_format}
-specifies the pair-anchored label file. Section~\ref{sec:iteration}
-details the iteration protocol and how model predictions are
-displayed. Section~\ref{sec:exchange} describes round-based data
-exchange between annotators.
+The rest of this section walks through the parts.
+Section~\ref{sec:session_structure} describes the session, a single
+directory that holds the images, the class configuration, the
+annotations, and the training artefacts, so the annotation tree is
+also the training dataset. Section~\ref{sec:label_format} specifies
+the pair-anchored label file and the per-iteration versioning.
+Section~\ref{sec:ui} covers the bi-temporal interface and the
+annotation tools. Section~\ref{sec:training} explains how training
+plugs into the loop through a folder contract rather than a
+built-in trainer. Section~\ref{sec:iteration} closes the loop:
+predictions, error review, and the exchange of a round between
+annotators.
 
 % -------------------------------------------------------------
 % 4.2 Session structure and initialization
@@ -159,50 +133,7 @@ creates an empty \texttt{iteration\_0/} with the four subfolders.
 The session is ready to open.
 
 % -------------------------------------------------------------
-% 4.3 Bi-temporal annotation interface
-% -------------------------------------------------------------
-\subsection{Bi-temporal annotation interface}
-\label{sec:ui}
-
-With the session on disk, the annotator opens it and presents the
-interface shown in Figure~\ref{fig:overview}A. The layout is
-symmetric: the reference canvas on the left, the frame canvas on
-the right. Both canvases display the same pixel grid, and every
-view operation --- zoom, pan, and the placement of points --- is
-mirrored between them. A click on either side lands the point at
-the same pixel on both.
-
-Above the reference canvas sits a compact reference selector: a
-dropdown listing every available reference for the current frame,
-flanked by \texttt{$\blacktriangleleft$} and
-\texttt{$\blacktriangleright$} buttons for step-through navigation
-(the shortcuts \texttt{,} and \texttt{.} do the same). References
-that already carry annotations are marked with a bullet in the
-dropdown; switching the reference switches the whole point set
-displayed on both canvases, so the user is always looking at the
-labels for one specific pair.
-
-The right-hand status panel exposes three counters, updated live as
-the user works: \textsc{total} for the whole session,
-\textsc{image} for the current frame across all its references, and
-\textsc{this pair} for the pair on screen. A line below the
-counters reports the number of pairs in the current frame that
-already carry points --- useful to know when a frame has been
-partially annotated against some references but not others. A
-mini-map above the counters shows the current viewport as a
-rectangle over a down-scaled copy of the frame.
-
-Interaction with the canvases follows a small vocabulary. A left
-click adds a point with the currently selected class; a right click
-near an existing point removes it; a middle-mouse drag pans the
-view; the mouse wheel zooms. Points can be dragged to fine-tune
-their position. The colour of each point comes from the class
-palette declared in \texttt{dataset\_metadata.json}, so the
-interface, the label files, and the prediction overlays share a
-single visual language.
-
-% -------------------------------------------------------------
-% 4.4 Pair-anchored label format
+% 4.3 Pair-anchored label format
 % -------------------------------------------------------------
 \subsection{Pair-anchored label format}
 \label{sec:label_format}
@@ -254,7 +185,67 @@ folder, so no split can accidentally place two references of the
 same scene on different sides of the partition.
 
 % -------------------------------------------------------------
-% 4.5 Iteration workflow and predictions
+% 4.4 Bi-temporal annotation interface
+% -------------------------------------------------------------
+\subsection{Bi-temporal annotation interface}
+\label{sec:ui}
+
+With the session on disk, the annotator opens it and presents the
+interface shown in Figure~\ref{fig:overview}A. The layout is
+symmetric: the reference canvas on the left, the frame canvas on
+the right. Both canvases display the same pixel grid, and every
+view operation --- zoom, pan, and the placement of points --- is
+mirrored between them. A click on either side lands the point at
+the same pixel on both.
+
+Above the reference canvas sits a compact reference selector: a
+dropdown listing every available reference for the current frame,
+flanked by \texttt{$\blacktriangleleft$} and
+\texttt{$\blacktriangleright$} buttons for step-through navigation
+(the shortcuts \texttt{,} and \texttt{.} do the same). References
+that already carry annotations are marked with a bullet in the
+dropdown; switching the reference switches the whole point set
+displayed on both canvases, so the user is always looking at the
+labels for one specific pair.
+
+The right-hand status panel exposes three counters, updated live as
+the user works: \textsc{total} for the whole session,
+\textsc{image} for the current frame across all its references, and
+\textsc{this pair} for the pair on screen. A line below the
+counters reports the number of pairs in the current frame that
+already carry points --- useful to know when a frame has been
+partially annotated against some references but not others. A
+mini-map above the counters shows the current viewport as a
+rectangle over a down-scaled copy of the frame.
+
+Interaction with the canvases follows a small vocabulary. A left
+click adds a point with the currently selected class; a right click
+near an existing point removes it; a middle-mouse drag pans the
+view; the mouse wheel zooms. Points can be dragged to fine-tune
+their position. The colour of each point comes from the class
+palette declared in \texttt{dataset\_metadata.json}, so the
+interface, the label files, and the prediction overlays share a
+single visual language.
+
+% -------------------------------------------------------------
+% 4.5 Training in the loop
+% -------------------------------------------------------------
+\subsection{Training in the loop}
+\label{sec:training}
+
+The training protocol is inherited from iSAGE without change. The
+user annotates points; the model is trained with an error-weighted
+loss that amplifies the gradient at each labeled pixel; the trained
+model produces per-pair predictions; the user reviews those
+predictions, focuses on the model's confident mistakes, and adds new
+points where the model is wrong. The loop repeats until the
+annotations stabilize. No pseudo-labels, conditional random fields,
+or foundation-model prompts are inserted between the clicks and the
+loss. What iSAGE-CD adds is in the representation of the pair, not
+in the training procedure.
+
+% -------------------------------------------------------------
+% 4.6 Iteration workflow and predictions
 % -------------------------------------------------------------
 \subsection{Iteration workflow and predictions}
 \label{sec:iteration}
@@ -312,12 +303,6 @@ script writes \texttt{iteration\_\{N\}/predictions/} and
 iteration with the fresh predictions already visible as the
 overlay --- ready for the next round of error-focused clicks.
 
-% -------------------------------------------------------------
-% 4.6 Round-trip data exchange
-% -------------------------------------------------------------
-\subsection{Round-trip data exchange}
-\label{sec:exchange}
-
 Because the annotation tree is the dataset, sharing a round of
 work between annotators reduces to sharing the annotation subtree
 of an iteration. The tool provides two commands for this:
@@ -338,4 +323,3 @@ surprising merge rule. In a typical two-person workflow one
 annotator finishes a round, exports the zip, and hands it to a
 reviewer, who imports it, revises the points, and either exports
 back or triggers a new training round.
-
