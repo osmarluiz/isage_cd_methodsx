@@ -8,20 +8,13 @@
 \subsection{Overview}
 \label{sec:overview}
 
-The iSAGE-CD annotator shows two co-registered images of the same
-place side by side. A click on either canvas lands a labeled point
-at the same pixel on both. The workflow follows iSAGE: the expert
-clicks on the model's confident mistakes, a model is trained on the
-accumulated points, its predictions return as an overlay, and the
-expert clicks again where the model is wrong. The loop repeats
-until the expert accepts the predictions by inspection.
-
-Three terms structure the description. A scene is a folder of
-dated, co-registered images of one place. A pair is a choice of two
-of those dates (before, after), and it is the unit of annotation
-and of training: each pair keeps its own point set. A point is an
-$[x, y, \mathrm{class}]$ triple on the pixel grid that the two
-dates share.
+The software shows two images of the same place at different dates
+side by side (Figure~\ref{fig:overview}). The pipeline alternates
+two steps, annotation and training: at each iteration the user sees
+where the model improved and where it did not, and adds points
+where they expect the most benefit, usually error regions. The loop
+runs inside a session, a directory structure that versions the
+dataset, the models, and the iterations automatically.
 
 % ------------------------------------------------------------------
 % FIGURE 1 — high-level pipeline diagram (TikZ, first pass)
@@ -46,91 +39,66 @@ dates share.
   \label{fig:overview}
 \end{figure}
 
-The rest of this section walks through the parts.
-Section~\ref{sec:session_structure} describes the session, a single
-directory that holds the images, the class configuration, the
-annotations, and the training artefacts, so the annotation tree is
-also the training dataset. Section~\ref{sec:label_format} specifies
-the pair-anchored label file and the per-iteration versioning.
-Section~\ref{sec:ui} covers the bi-temporal interface and the
-annotation tools. Section~\ref{sec:training} explains how training
-plugs into the loop through a folder contract rather than a
-built-in trainer. Section~\ref{sec:iteration} closes the loop:
-predictions, error review, and the exchange of a round between
-annotators.
-
 % -------------------------------------------------------------
-% 4.2 Session structure and initialization
+% Session structure
 % -------------------------------------------------------------
-\subsection{Session structure and initialization}
+\subsection{Session structure}
 \label{sec:session_structure}
 
-The Overview showed that the annotation tree \emph{is} the dataset.
-This subsection specifies the tree. A session lives in a single
-directory that contains the images, the class configuration, the
-per-iteration annotations, and the training artefacts:
+A session is a single directory that contains the images, the class
+configuration, the per-iteration annotations, and the training
+artefacts:
 
 \begin{verbatim}
-Sessions/Amazon/
+Sessions/CD/
 +-- config/
-|   +-- session_config.json     current_iteration
+|   +-- session_config.json     current_iteration, format
 |   +-- dataset_metadata.json   classes, colors, ignore_index
 +-- data/dataset/train/
-|   +-- images/                 frames (one PNG per frame)
-|   +-- images_before/          references (one folder per frame)
-|   +-- pair_meta/              per-frame metadata (date_after, ...)
+|   +-- <scene>/                one folder per scene
+|       +-- 202106.png          dated, co-registered images
+|       +-- 202108.png          (name = YYYYMM or YYYYMMDD)
+|       +-- 202206.png
 +-- iteration_0/
-|   +-- annotations/            one folder per frame, JSON per pair
-|   +-- predictions/            per-frame prediction PNGs
+|   +-- annotations/            one folder per scene, JSON per pair
+|   +-- predictions/            per-pair prediction PNGs
 |   +-- models/                 trained checkpoints
 |   +-- masks/                  optional dense masks
 +-- iteration_1/
 +-- ...
 \end{verbatim}
 
-Two configuration files sit under \texttt{config/}. The first,
-\texttt{session\_config.json}, holds a single field
-(\texttt{current\_iteration}) that names the iteration the user is
-currently annotating. The second,
-\texttt{dataset\_metadata.json}, declares the classes: how many
-there are, which index means ``unlabeled'', and, for each class, a
-human-readable name and a display colour. This declaration is the
-one authority on class semantics; the interface, the label files,
-and the prediction overlays all read from it.
+Each scene folder is a pool of dates. The file name is the date, as
+a digit string whose lexicographic order is the chronological
+order, so the tool compares strings and never parses calendars.
+Which two dates form a pair is not fixed at build time: any
+(before, after) choice made in the interface is a valid pair, and a
+scene with $n$ dates offers $n(n-1)/2$ of them.
 
-A session is built by a helper script that takes a folder of
-co-registered image pairs and a class definition and writes the
-directory tree above. The input folder has one subfolder per frame:
+Two configuration files sit under \texttt{config/}.
+\texttt{session\_config.json} names the iteration the user is
+currently annotating. \texttt{dataset\_metadata.json} declares the
+classes: how many there are, which index means ``unlabeled'', and,
+for each class, a name and a display colour. The interface, the
+label files, and the prediction overlays all read class semantics
+from this one file.
 
-\begin{verbatim}
-entrada/
-+-- 0000/
-|   +-- depois.png             the fixed image
-|   +-- antes_202106.png       one or more references
-|   +-- antes_202108.png       (label = YYYYMM)
-+-- 0001/ ...
-\end{verbatim}
-
-The classes file is a short JSON list, one entry per class, in
-index order:
-
-\begin{verbatim}
-[{"name": "No change", "color": "#2e8b3d"},
- {"name": "Change",    "color": "#e5194b"}]
-\end{verbatim}
-
-The build command is a single call:
+A helper script builds the session from a folder with one
+subdirectory per scene, each holding two or more dated,
+co-registered images, plus a classes file (a JSON list of
+name and color in index order):
 
 \begin{verbatim}
 python tools/build_session.py entrada/ \
-    --classes classes.json --out Sessions/Amazon
+    --classes classes.json --out Sessions/CD
 \end{verbatim}
 
-The script copies each \texttt{depois.png} into
-\texttt{images/<frame>.png}, each \texttt{antes\_YYYYMM.png} into
-\texttt{images\_before/<frame>/}, writes the two config files, and
-creates an empty \texttt{iteration\_0/} with the four subfolders.
-The session is ready to open.
+The script copies the dated images into \texttt{train/<scene>/},
+writes the two configuration files, and creates an empty
+\texttt{iteration\_0/} with the four subfolders above. The session
+is ready to open. Co-registration and resampling are upstream
+concerns: the tool assumes all images of a scene share one pixel
+grid.
 
 % -------------------------------------------------------------
 % 4.3 Pair-anchored label format
