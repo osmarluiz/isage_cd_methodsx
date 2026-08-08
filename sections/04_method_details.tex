@@ -224,59 +224,37 @@ of the pair, not the training procedure.
 % -------------------------------------------------------------
 % 4.6 Iteration workflow and predictions
 % -------------------------------------------------------------
-\subsection{Iteration workflow and predictions}
+\subsection{Iteration workflow}
 \label{sec:iteration}
 
 Each round of activity is stored in a numbered
 \texttt{iteration\_N/} subfolder (Table~\ref{tab:iteration_folder}),
 and the \texttt{current\_iteration} field in
-\texttt{session\_config.json} names the iteration the user is
-currently annotating.
+\texttt{session\_config.json} names the round the user is
+annotating.
 
-The prediction overlay in the interface follows a simple
-convention: the predictions displayed on the frame come from
-\texttt{iteration\_\{N-1\}/predictions/<frame>.png}, where
-\texttt{N} is the current iteration. In other words, the user
-always sees the output of the model trained in the previous round
-while annotating the next round --- exactly the surface the iSAGE
-error-focused click strategy needs. Iteration 0 has no previous
-round, so no overlay is loaded; from iteration 1 onward the
-overlay is available.
+While annotating round $N$ the user sees the model of round $N-1$:
+the overlay for the pair on screen is read from
+\texttt{iteration\_\{N-1\}/predictions/<scene>/<before>\_<after>.png},
+so the surface under review is always the previous round's
+predictions for that exact pair. Iteration 0 has no overlay.
+Prediction PNGs carry class indices matching
+\texttt{dataset\_metadata.json}, so points and predictions share
+one palette. The overlay opacity is adjustable and the \texttt{P}
+key shows it while held.
 
-Prediction PNGs use class-index values: a pixel with value
-\texttt{0} is background, \texttt{1} is the first foreground class,
-and so on, up to \texttt{num\_classes - 1}. This matches the class
-indices declared in \texttt{dataset\_metadata.json}, so the
-overlay is coloured with the same palette as the point classes:
-what the user clicked and what the model predicts share a visual
-language. The overlay opacity is adjustable through the control
-panel; the toggle key \texttt{P} shows the overlay while held.
+Closing a round is the trainer's job
+(Section~\ref{sec:training}): it writes \texttt{models/} and
+\texttt{predictions/} of round $N$, creates
+\texttt{iteration\_\{N+1\}/annotations/}, and increments
+\texttt{current\_iteration}. The next session opens on the new
+round with the fresh predictions as the overlay.
 
-A new iteration is created after training completes. The training
-script writes \texttt{iteration\_\{N\}/predictions/} and
-\texttt{iteration\_\{N\}/models/}, creates an empty
-\texttt{iteration\_\{N+1\}/annotations/} folder, and increments
-\texttt{current\_iteration}. The next session re-opens on the new
-iteration with the fresh predictions already visible as the
-overlay --- ready for the next round of error-focused clicks.
-
-Because the annotation tree is the dataset, sharing a round of
-work between annotators reduces to sharing the annotation subtree
-of an iteration. The tool provides two commands for this:
-
-\begin{verbatim}
-python anotar.py --exportar
-python anotar.py --importar rotulos.zip
-\end{verbatim}
-
-The first packages the JSONs of the current iteration into a
-timestamped zip under \texttt{envio/} and opens the containing
-folder; the file can be sent through any channel. The second
-merges the JSONs from a received zip into the corresponding
-iteration folder of the local session. Pairs that were not present
-locally are added; pairs that were already present are overwritten
-with the incoming version, which is the simplest and least
-surprising merge rule. In a typical two-person workflow one
-annotator finishes a round, exports the zip, and hands it to a
-reviewer, who imports it, revises the points, and either exports
-back or triggers a new training round.
+Because the annotation tree is the dataset, sharing a round between
+annotators is sharing the annotation subtree of one iteration.
+\texttt{anotar.py -{}-exportar} zips the JSONs of the current
+round, and \texttt{-{}-importar} merges a received zip into the
+local session, adding pairs that were absent and overwriting pairs
+that exist, the simplest merge rule. In a typical two-person
+workflow one annotator exports the round, a reviewer imports it,
+revises the points, and exports back or triggers training.
