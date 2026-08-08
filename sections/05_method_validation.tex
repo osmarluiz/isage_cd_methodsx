@@ -30,6 +30,12 @@ test; it reflects the operational sequence in which the session
 was actually built, and the two blocks together provided the pool
 from which the training iterations were carried out.
 
+% -------------------------------------------------------------
+% 5.2 Running the loop
+% -------------------------------------------------------------
+\subsection{Running the loop}
+\label{sec:val_convergence}
+
 Annotation was performed by a single expert working the tool as a
 practitioner would: no budget of clicks per tile was imposed, no
 target number of iterations was set in advance, and no validation
@@ -43,14 +49,17 @@ tile (min 3, max 702) and an approximately balanced class split
 cover 0.007\% of the roughly $2.1\times10^{9}$ pixels in the
 session, about one labeled pixel in every 14{,}600. Working this
 way, the expert ran five iterations of the click-train-predict
-loop, and the convergence pattern across those iterations is
-described next.
+loop.
 
-% -------------------------------------------------------------
-% 5.2 Convergence across iterations
-% -------------------------------------------------------------
-\subsection{Convergence across iterations}
-\label{sec:val_convergence}
+Training instantiated the reference protocol of
+Section~\ref{sec:training}: a U-Net with an EfficientNet-B7
+encoder over eight-channel stacks of the two dates, the
+error-weighted loss of iSAGE, and 150 epochs per round with a warm
+start from the previous best model. Full-image predictions used a
+sliding window of 1024 pixels with 50\% overlap. Each of those is
+a choice of this session, not a constant of the software: the tool
+sees dated images, a class definition, and pairs, whatever the
+sensor, the theme, or the model.
 
 Figure~\ref{fig:convergence} shows the training loss over all five
 iterations, plotted against cumulative epoch. Each iteration is
@@ -91,9 +100,9 @@ rigorous quantitative evaluation is the subject of a separate
 manuscript in preparation.
 
 % -------------------------------------------------------------
-% 5.3 Qualitative examples
+% 5.3 Qualitative inspection
 % -------------------------------------------------------------
-\subsection{Qualitative examples}
+\subsection{Qualitative inspection}
 \label{sec:val_qualitative}
 
 Beyond the loss curve, the most direct check of the method is
