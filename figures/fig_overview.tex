@@ -1,83 +1,69 @@
 % =============================================================
-% Figure 1 (fig:overview) — iSAGE-CD pipeline diagram
-% Layout: A on top (full width) ; B and C side-by-side below.
-% Panel A label sits ABOVE the panel (image already has its own UI
-% header). Panel B and C labels are inside their top-left corners,
-% since they are schematic and have plenty of blank space there.
+% Figure 1 (fig:overview) — iSAGE-CD pipeline
+% (a) screenshot full width; (b) session tree and (c) loop below,
+% equal heights, outer edges aligned with (a). Tags (a)(b)(c) are
+% the only text besides panel content; the caption explains.
 % =============================================================
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
   font=\sffamily\footnotesize,
-  panel/.style={draw=black!40, rounded corners=3pt,
-                inner sep=8pt},
-  loopbox/.style={draw=black!50, rounded corners=2pt,
-                  minimum width=2.6cm, minimum height=0.8cm,
-                  fill=gray!5, align=center, inner sep=2pt},
-  arr/.style={-{Latex[length=2mm]}, thick},
-  panellabel/.style={font=\bfseries, inner sep=2pt,
-                     fill=white, rounded corners=1pt},
-  caption/.style={font=\scriptsize\itshape},
+  panel/.style={draw=black!30, line width=0.4pt, inner sep=0pt},
+  tag/.style={font=\sffamily\small, inner sep=2pt},
+  loopbox/.style={draw=black!30, line width=0.4pt, rounded corners=2pt,
+                  fill=treebg, minimum width=2.35cm, minimum height=0.92cm,
+                  align=center, inner sep=2pt},
+  looparr/.style={-{Latex[length=2.2mm]}, line width=0.9pt,
+                  draw=treefolder},
+  sub/.style={font=\sffamily\tiny, text=treecomment},
 ]
 
-% ================================================================
-% PANEL A — Interaction (real screenshot, full width on top)
-% ================================================================
-\node[panel] (A) at (0, 0) {%
-  \includegraphics[width=15.4cm]{figures/screenshot_ui.png}%
+% ---------------------------------------------------------------- (a)
+\node[panel] (A) at (0, 0)
+     {\includegraphics[width=15.4cm]{figures/screenshot_ui.png}};
+\node[tag, anchor=south west] at ($(A.north west) + (-2pt, 1pt)$) {(a)};
+
+% ---------------------------------------------------------------- (b)
+\node[panel, minimum width=7.5cm, minimum height=5.8cm,
+      below=4mm of A.south west, anchor=north west] (B) {};
+\node[tag, anchor=south west] at ($(B.north west) + (-2pt, 1pt)$) {(b)};
+
+\begin{scope}
+\node[align=left, font=\ttfamily\scriptsize,
+      inner sep=0pt] at ($(B.center) + (-0.55, 0)$) {%
+\textcolor{treefolder}{\bfseries Sessions/CD/}\\[1pt]
+\ \ \textcolor{treefolder}{\bfseries data/dataset/train/}\\[1pt]
+\ \ \ \ \textcolor{treefolder}{\bfseries 0000/}\\[1pt]
+\ \ \ \ \ \ 202106.png\\[1pt]
+\ \ \ \ \ \ 202108.png\\[1pt]
+\ \ \ \ \ \ 202206.png\\[1pt]
+\ \ \textcolor{treefolder}{\bfseries iteration\_0/}\\[1pt]
+\ \ \ \ \textcolor{treefolder}{\bfseries annotations/0000/}\\[1pt]
+\ \ \ \ \ \ 202106\_202206.json\\[1pt]
+\ \ \ \ \textcolor{treefolder}{\bfseries predictions/}\ \ %
+\textcolor{treefolder}{\bfseries models/}\\[1pt]
+\ \ \textcolor{treefolder}{\bfseries iteration\_1/}\ \dots%
 };
-% Label OUTSIDE (above the panel) so it does not overlap the image
-\node[panellabel, above=1pt of A.north west, anchor=south west]
-     {A.\ Interaction};
+\end{scope}
 
-% ================================================================
-% PANEL B — Data (annotation tree == dataset), bottom-left
-% ================================================================
-\node[panel, minimum width=7.4cm, minimum height=6.4cm,
-      below=6mm of A.south west, anchor=north west] (B) {};
-\node[panellabel, anchor=north west] at ($(B.north west) + (4pt, -4pt)$)
-     {B.\ Data};
+% ---------------------------------------------------------------- (c)
+\node[panel, minimum width=7.5cm, minimum height=5.8cm,
+      below=4mm of A.south east, anchor=north east] (C) {};
+\node[tag, anchor=south west] at ($(C.north west) + (-2pt, 1pt)$) {(c)};
 
-\node[font=\ttfamily\scriptsize, align=left] at (B.center) {%
-Sessions/Amazon/\\
-|-- data/dataset/train/\\
-|\ \ \ |-- images/0000.png\\
-|\ \ \ `-- images\_before/\\
-|\ \ \ \ \ \ \ \ \ \ \ `-- 0000/antes\_202108.png\\
-|-- iteration\_0/\\
-|\ \ \ |-- annotations/0000/\\
-|\ \ \ |\ \ \ \ \ \ \ `-- 202108.json\\
-|\ \ \ |-- predictions/\\
-|\ \ \ `-- models/\\
-`-- iteration\_1/~\dots%
-};
+\coordinate (cc) at ($(C.center) + (0, 0)$);
+\node[loopbox] (an) at ($(cc) + (0,  1.85)$)
+     {annotate\\[-1pt]{\tiny\color{treecomment}clicks on a pair}};
+\node[loopbox] (tr) at ($(cc) + (2.35, 0)$)
+     {train\\[-1pt]{\tiny\color{treecomment}error-weighted}};
+\node[loopbox] (pr) at ($(cc) + (0, -1.85)$)
+     {predict\\[-1pt]{\tiny\color{treecomment}per pair}};
+\node[loopbox] (re) at ($(cc) + (-2.35, 0)$)
+     {review\\[-1pt]{\tiny\color{treecomment}model errors}};
 
-\node[caption] at ($(B.south) + (0, 0.30)$)
-     {annotation tree $=$ training dataset};
-
-% ================================================================
-% PANEL C — Training (iterative click loop), bottom-right
-% ================================================================
-\node[panel, minimum width=7.4cm, minimum height=6.4cm,
-      below=6mm of A.south east, anchor=north east] (C) {};
-\node[panellabel, anchor=north west] at ($(C.north west) + (4pt, -4pt)$)
-     {C.\ Training};
-
-\node[loopbox] (an) at ($(C.center) + (0,  2.05)$)
-     {annotate\\{\tiny clicks on pair}};
-\node[loopbox] (tr) at ($(C.center) + (0,  0.70)$)
-     {train\\{\tiny error-weighted}};
-\node[loopbox] (pr) at ($(C.center) + (0, -0.70)$)
-     {predict\\{\tiny per pair}};
-\node[loopbox] (re) at ($(C.center) + (0, -2.05)$)
-     {review\\{\tiny model errors}};
-
-\draw[arr] (an) -- (tr);
-\draw[arr] (tr) -- (pr);
-\draw[arr] (pr) -- (re);
-\draw[arr] (re.west) to[out=180, in=180, looseness=2.4] (an.west);
-
-\node[caption] at ($(C.south) + (0, 0.30)$)
-     {iSAGE loop, unchanged};
+\draw[looparr] (an.east) to[bend left=28] (tr.north);
+\draw[looparr] (tr.south) to[bend left=28] (pr.east);
+\draw[looparr] (pr.west) to[bend left=28] (re.south);
+\draw[looparr] (re.north) to[bend left=28] (an.west);
 
 \end{tikzpicture}%
 }

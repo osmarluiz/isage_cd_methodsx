@@ -22,20 +22,15 @@ dataset, the models, and the iterations automatically.
 \begin{figure}[htbp]
   \centering
   \input{figures/fig_overview}
-  \caption{Overview of iSAGE-CD. \textbf{(A)} Screenshot of the
-    bi-temporal annotation interface running the Amazon session
-    (\textsc{before} Jun 2021, \textsc{after} Jun 2022 -- tile 0000
-    of the PRODES 2022 pair). Clicks are co-registered on the two
-    canvases; the side panels expose class selection (left) and the
-    mini-map plus annotation counters (right). \textbf{(B)} The
-    session directory holds the images, the pair-anchored
-    annotation files, and the training artefacts (models,
-    predictions) in the same tree, so the annotation tree \emph{is}
-    the training dataset. \textbf{(C)} The training loop is
-    inherited from iSAGE without change: the user annotates points,
-    the model is trained with an error-weighted loss, per-pair
-    predictions are generated, and the user reviews the model's
-    confident mistakes.}
+  \caption{Overview of iSAGE-CD. (a)~The bi-temporal interface on
+    the Amazon session of the validation: two synchronized
+    canvases, class selection on the left, mini-map and annotation
+    counters on the right. (b)~One session directory holds the
+    images, the pair-anchored annotations, the models, and the
+    predictions, so the annotation tree is also the training
+    dataset. (c)~The iteration loop, inherited from iSAGE:
+    annotate, train with an error-weighted loss, predict per pair,
+    review the errors.}
   \label{fig:overview}
 \end{figure}
 
