@@ -197,7 +197,7 @@ the loop, whatever the framework or the architecture.
 \centering
 \small
 \caption{Contents of a single \texttt{iteration\_N/} folder. Each
-subfolder has a single producer and a single consumer; together
+subfolder has a single producer and a single consumer, and together
 they close the annotate/train/predict/review loop.}
 \label{tab:iteration_folder}
 \begin{tabular}{@{}lll@{}}
@@ -207,7 +207,7 @@ Subfolder            & Produced by                        & Consumed by \\
 \texttt{annotations/} & user clicks during round $N$      & training script at end of round $N$ \\
 \texttt{models/}      & training script                   & prediction script \\
 \texttt{predictions/} & prediction script                 & overlay shown in round $N{+}1$ \\
-\texttt{masks/}       & (optional; dense mask utilities)  & external evaluation \\
+\texttt{masks/}       & optional dense-mask utilities     & external evaluation \\
 \bottomrule
 \end{tabular}
 \end{table}
