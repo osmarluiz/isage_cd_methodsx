@@ -61,43 +61,11 @@ a choice of this session, not a constant of the software: the tool
 sees dated images, a class definition, and pairs, whatever the
 sensor, the theme, or the model.
 
-Figure~\ref{fig:convergence} shows the training loss over all five
-iterations, plotted against cumulative epoch. Each iteration is
-trained until the loss plateaus (150 epochs by default, except the
-short warm-start of round v2). The best per-iteration loss falls
-from 0.0134 in v1 to a similar 0.0153 in v5; the intermediate v2
-warm-start attained the lowest observed value (0.0086) on the
-subset of tiles already annotated at that point.
-
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=0.92\linewidth]{figures/fig_convergence.pdf}
-  \caption{Training loss across the five iterations of the Amazon
-    session, on a logarithmic scale. Colours identify iterations;
-    dotted vertical lines mark iteration boundaries. Each iteration
-    resumes from the previous best model, but the loss visibly
-    jumps up whenever new points are folded in (most clearly at
-    the boundaries of v3 and v5) and is then driven back to the
-    $\sim\!10^{-2}$ regime by continued training. The best-loss
-    epoch of each round is highlighted.}
-  \label{fig:convergence}
-\end{figure}
-
-Two features of the curve are worth noting because they reflect
-how the iSAGE loop is meant to work rather than any peculiarity of
-our dataset. First, the loss does not decrease monotonically across
-iterations. Each round adds points, and every new point that the
-model was previously wrong about increases the loss transiently
-before training absorbs it. Round v3 added the second half of
-Block~A and v5 introduced Block~B, and the spikes at the beginning
-of those two rounds are the visible signature. Second, the plateau value that
-each iteration reaches is remarkably stable
-($\approx\!10^{-2}$ across all five), which is consistent with the
-iSAGE observation that a small number of error-focused clicks per
-round is enough to close most of the gap to dense supervision. We
-do not compare against a dense-supervision baseline here; a
-rigorous quantitative evaluation is the subject of a separate
-manuscript in preparation.
+Each round grew the annotation rather than replacing it. Round v3
+extended it to the second half of Block~A and v5 introduced
+Block~B. We do not compare against a dense-supervision baseline
+here, and a rigorous quantitative evaluation is the subject of a
+separate manuscript in preparation.
 
 % -------------------------------------------------------------
 % 5.3 Qualitative inspection
