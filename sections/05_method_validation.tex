@@ -51,6 +51,34 @@ session, about one labeled pixel in every 14{,}600. Working this
 way, the expert ran five iterations of the click-train-predict
 loop.
 
+Figure~\ref{fig:pointsperiter} shows how the annotation budget was
+spent across those iterations. The first round (v1) received the
+bulk of the initial clicks
+(54{,}913 points on Block~A --- the specialist's cold-start pass);
+v2 and v4 were short refinement rounds targeting specific error
+patterns (only 205 and 131 new points respectively); v3 added the
+second half of Block~A and roughly doubled the pool
+($+38{,}318$ points); and v5 introduced Block~B, contributing
+another 49{,}925 points on a previously unseen tile set. The
+resulting cumulative pool at v5 is 143{,}492 points, split as
+65{,}170 \emph{change} and 78{,}322 \emph{no change} --- an
+approximately class-balanced supervision signal despite the strong
+class imbalance of the underlying scene.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_points_per_iter.pdf}
+  \caption{Annotation effort across the five iterations of the
+    Amazon session. (A)~Points added at each round, stacked by
+    class (red $=$ \emph{change}, green $=$ \emph{no change}).
+    Numbers above the bars are the totals. v2 and v4 are short
+    refinement passes; v3 and v5 are large expansions
+    (second half of Block~A, and full Block~B respectively).
+    (B)~Cumulative annotation pool available for training at the
+    end of each round.}
+  \label{fig:pointsperiter}
+\end{figure}
+
 Training instantiated the reference protocol of
 Section~\ref{sec:training}: a U-Net with an EfficientNet-B7
 encoder over eight-channel stacks of the two dates, the
@@ -66,6 +94,34 @@ extended it to the second half of Block~A and v5 introduced
 Block~B. We do not compare against a dense-supervision baseline
 here, and a rigorous quantitative evaluation is the subject of a
 separate manuscript in preparation.
+
+The iteration-by-iteration effect is visible directly on the
+predictions. Figure~\ref{fig:iterprogression} shows four
+representative Block~A tiles under the successive models v1 through
+v5. Reading each row left to right, the predicted change footprint
+sharpens as points accumulate: v1 already picks up the dominant
+clearings but oversegments edges and misses small fragments; v3
+(after Block~A was completed) recovers finer structure; and v5,
+which folded in Block~B, further consolidates edges and reduces
+spurious activations in predominantly forested tiles. The
+refinement rounds v2 and v4 introduce only local corrections,
+consistent with the small number of points added at those steps
+(Fig.~\ref{fig:pointsperiter}A).
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_iteration_progression.pdf}
+  \caption{Iteration-by-iteration progression of the model
+    predictions on four representative Block~A tiles. Columns:
+    PlanetScope T1 (before), PlanetScope T2 (after), and the
+    predicted change footprint of models v1--v5 overlaid on T2
+    (translucent red). Rows correspond to tiles with different
+    change patterns (see per-row change percentage). Predictions
+    become progressively sharper and more coherent with the visible
+    T1$\to$T2 difference as more points are folded in; the largest
+    jumps happen at v3 (Block~A completed) and v5 (Block~B added).}
+  \label{fig:iterprogression}
+\end{figure}
 
 % -------------------------------------------------------------
 % 5.3 Qualitative inspection
