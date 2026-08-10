@@ -86,11 +86,11 @@ subset of tiles already annotated at that point.
 Two features of the curve are worth noting because they reflect
 how the iSAGE loop is meant to work rather than any peculiarity of
 our dataset. First, the loss does not decrease monotonically across
-iterations: each round adds points, and every new point that the
+iterations. Each round adds points, and every new point that the
 model was previously wrong about increases the loss transiently
-before training absorbs it. The spikes at the beginnings of v3 and
-v5 are the visible signature of this: v3 added the second half of
-Block~A and v5 introduced Block~B. Second, the plateau value that
+before training absorbs it. Round v3 added the second half of
+Block~A and v5 introduced Block~B, and the spikes at the beginning
+of those two rounds are the visible signature. Second, the plateau value that
 each iteration reaches is remarkably stable
 ($\approx\!10^{-2}$ across all five), which is consistent with the
 iSAGE observation that a small number of error-focused clicks per

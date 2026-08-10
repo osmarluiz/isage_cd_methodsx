@@ -1,8 +1,9 @@
 % =============================================================
 % Figure 1 (fig:overview) — iSAGE-CD pipeline
-% (a) screenshot full width; (b) session tree and (c) loop below,
-% equal heights, outer edges aligned with (a). Tags (a)(b)(c) are
-% the only text besides panel content; the caption explains.
+% (a) interface screenshot, full width; (b) the iteration loop as a
+% horizontal chain of the same width. The session tree is NOT
+% repeated here: it lives in the Session structure subsection.
+% Tags (a)(b) are the only text besides panel content.
 % =============================================================
 \resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[
@@ -10,11 +11,10 @@
   panel/.style={draw=black!30, line width=0.4pt, inner sep=0pt},
   tag/.style={font=\sffamily\small, inner sep=2pt},
   loopbox/.style={draw=black!30, line width=0.4pt, rounded corners=2pt,
-                  fill=treebg, minimum width=2.35cm, minimum height=0.92cm,
+                  fill=treebg, minimum width=2.9cm, minimum height=1.05cm,
                   align=center, inner sep=2pt},
   looparr/.style={-{Latex[length=2.2mm]}, line width=0.9pt,
                   draw=treefolder},
-  sub/.style={font=\sffamily\tiny, text=treecomment},
 ]
 
 % ---------------------------------------------------------------- (a)
@@ -23,47 +23,25 @@
 \node[tag, anchor=south west] at ($(A.north west) + (-2pt, 1pt)$) {(a)};
 
 % ---------------------------------------------------------------- (b)
-\node[panel, minimum width=7.5cm, minimum height=5.8cm,
+\node[panel, minimum width=15.4cm, minimum height=3.1cm,
       below=4mm of A.south west, anchor=north west] (B) {};
 \node[tag, anchor=south west] at ($(B.north west) + (-2pt, 1pt)$) {(b)};
 
-\begin{scope}
-\node[align=left, font=\ttfamily\scriptsize,
-      inner sep=0pt] at ($(B.center) + (-0.55, 0)$) {%
-\textcolor{treefolder}{\bfseries Sessions/CD/}\\[1pt]
-\ \ \textcolor{treefolder}{\bfseries data/dataset/train/}\\[1pt]
-\ \ \ \ \textcolor{treefolder}{\bfseries 0000/}\\[1pt]
-\ \ \ \ \ \ 202106.png\\[1pt]
-\ \ \ \ \ \ 202108.png\\[1pt]
-\ \ \ \ \ \ 202206.png\\[1pt]
-\ \ \textcolor{treefolder}{\bfseries iteration\_0/}\\[1pt]
-\ \ \ \ \textcolor{treefolder}{\bfseries annotations/0000/}\\[1pt]
-\ \ \ \ \ \ 202106\_202206.json\\[1pt]
-\ \ \ \ \textcolor{treefolder}{\bfseries predictions/}\ \ %
-\textcolor{treefolder}{\bfseries models/}\\[1pt]
-\ \ \textcolor{treefolder}{\bfseries iteration\_1/}\ \dots%
-};
-\end{scope}
-
-% ---------------------------------------------------------------- (c)
-\node[panel, minimum width=7.5cm, minimum height=5.8cm,
-      below=4mm of A.south east, anchor=north east] (C) {};
-\node[tag, anchor=south west] at ($(C.north west) + (-2pt, 1pt)$) {(c)};
-
-\coordinate (cc) at ($(C.center) + (0, 0)$);
-\node[loopbox] (an) at ($(cc) + (0,  1.85)$)
+\coordinate (bc) at ($(B.center) + (0, 0.28)$);
+\node[loopbox] (an) at ($(bc) + (-5.55, 0)$)
      {annotate\\[-1pt]{\tiny\color{treecomment}clicks on a pair}};
-\node[loopbox] (tr) at ($(cc) + (2.35, 0)$)
+\node[loopbox] (tr) at ($(bc) + (-1.85, 0)$)
      {train\\[-1pt]{\tiny\color{treecomment}error-weighted}};
-\node[loopbox] (pr) at ($(cc) + (0, -1.85)$)
+\node[loopbox] (pr) at ($(bc) + ( 1.85, 0)$)
      {predict\\[-1pt]{\tiny\color{treecomment}per pair}};
-\node[loopbox] (re) at ($(cc) + (-2.35, 0)$)
+\node[loopbox] (re) at ($(bc) + ( 5.55, 0)$)
      {review\\[-1pt]{\tiny\color{treecomment}model errors}};
 
-\draw[looparr] (an.east) to[bend left=28] (tr.north);
-\draw[looparr] (tr.south) to[bend left=28] (pr.east);
-\draw[looparr] (pr.west) to[bend left=28] (re.south);
-\draw[looparr] (re.north) to[bend left=28] (an.west);
+\draw[looparr] (an) -- (tr);
+\draw[looparr] (tr) -- (pr);
+\draw[looparr] (pr) -- (re);
+\draw[looparr] (re.south) -- ++(0, -0.62)
+      -| ($(an.south) + (0, -0.62)$) -- (an.south);
 
 \end{tikzpicture}%
 }

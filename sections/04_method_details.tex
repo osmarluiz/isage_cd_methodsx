@@ -10,7 +10,7 @@
 
 The software shows two images of the same place at different dates
 side by side (Figure~\ref{fig:overview}). The pipeline alternates
-two steps, annotation and training: at each iteration the user sees
+two steps, annotation and training. At each iteration the user sees
 where the model improved and where it did not, and adds points
 where they expect the most benefit, usually error regions. The loop
 runs inside a session, a directory structure that versions the
@@ -25,12 +25,8 @@ dataset, the models, and the iterations automatically.
   \caption{Overview of iSAGE-CD. (a)~The bi-temporal interface on
     the Amazon session of the validation: two synchronized
     canvases, class selection on the left, mini-map and annotation
-    counters on the right. (b)~One session directory holds the
-    images, the pair-anchored annotations, the models, and the
-    predictions, so the annotation tree is also the training
-    dataset. (c)~The iteration loop, inherited from iSAGE:
-    annotate, train with an error-weighted loss, predict per pair,
-    review the errors.}
+    counters on the right. (b)~The iteration loop, inherited from
+    iSAGE, with the round closing back on the annotator.}
   \label{fig:overview}
 \end{figure}
 
@@ -72,7 +68,7 @@ artefacts:
 Each scene folder is a pool of dates. The file name is the date, as
 a digit string whose lexicographic order is the chronological
 order, so the tool compares strings and never parses calendars.
-Which two dates form a pair is not fixed at build time: any
+Which two dates form a pair is not fixed at build time. Any
 (before, after) choice made in the interface is a valid pair, and a
 scene with $n$ dates offers $n(n-1)/2$ of them.
 
@@ -97,9 +93,9 @@ python tools/build_session.py entrada/ \
 The script copies the dated images into \texttt{train/<scene>/},
 writes the two configuration files, and creates an empty
 \texttt{iteration\_0/} with the four subfolders above. The session
-is ready to open. Co-registration and resampling are upstream
-concerns: the tool assumes all images of a scene share one pixel
-grid.
+is ready to open. The tool assumes all images of a scene share one
+pixel grid, so co-registration and resampling are upstream
+concerns.
 
 % -------------------------------------------------------------
 % 4.3 Pair-anchored label format
@@ -139,10 +135,11 @@ semantics of a change label. The same region can be change against
 one before date and no change against another, and each statement
 lives in its own file, so neither contaminates the other.
 
-The file is rewritten at every click: there is no save button and
-no unsaved state. Every write is atomic: the annotator serialises
-the JSON to a temporary file and only then renames it into place,
-so a crash mid-write cannot leave a half-written file on disk. A pair whose
+The file is rewritten at every click, so there is no save button
+and no unsaved state. Every write is atomic. The annotator
+serialises the JSON to a temporary file and only then renames it
+into place, so a crash mid-write cannot leave a half-written file
+on disk. A pair whose
 point set becomes empty has its file removed, and the scene folder
 is removed with its last pair. The file tree is always a faithful
 representation of the current annotation.
@@ -212,9 +209,9 @@ Subfolder            & Produced by                        & Consumed by \\
 \end{tabular}
 \end{table}
 
-The reference protocol is inherited from iSAGE~\cite{isage}. Each
-pair file is one training sample: the two images are stacked as
-input channels and the points are the sparse targets. The model is
+The reference protocol is inherited from iSAGE~\cite{isage}. The
+two images of the pair are stacked as input channels and the
+points are the sparse targets. The model is
 trained with an error-weighted loss that amplifies the gradient at
 each labeled pixel, and nothing is inserted between the clicks and
 the loss: no pseudo-labels, no conditional random fields, no
@@ -228,13 +225,11 @@ of the pair, not the training procedure.
 \label{sec:iteration}
 
 Each round of activity is stored in a numbered
-\texttt{iteration\_N/} subfolder (Table~\ref{tab:iteration_folder}),
-and the \texttt{current\_iteration} field in
-\texttt{session\_config.json} names the round the user is
-annotating.
+\texttt{iteration\_N/} subfolder
+(Table~\ref{tab:iteration_folder}).
 
-While annotating round $N$ the user sees the model of round $N-1$:
-the overlay for the pair on screen is read from
+While annotating round $N$ the user sees the model of round $N-1$.
+The overlay for the pair on screen comes from
 \texttt{iteration\_\{N-1\}/predictions/<scene>/<before>\_<after>.png},
 so the surface under review is always the previous round's
 predictions for that exact pair. Iteration 0 has no overlay.
