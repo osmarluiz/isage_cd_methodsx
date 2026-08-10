@@ -12,9 +12,18 @@
 \usepackage{xurl}
 \usepackage{dirtree}
 \usepackage[most]{tcolorbox}
+\usepackage{fancyvrb}
 \definecolor{treebg}{HTML}{F7F8FA}
 \definecolor{treefolder}{HTML}{1A5276}
 \definecolor{treecomment}{HTML}{7A7F87}
+\definecolor{jsonkey}{HTML}{1A5276}
+\definecolor{jsonstr}{HTML}{9C4221}
+\definecolor{jsonnum}{HTML}{6B3FA0}
+\definecolor{jsonpunct}{HTML}{9AA0A6}
+\newcommand{\jk}[1]{\textcolor{jsonkey}{#1}}   % chave
+\newcommand{\js}[1]{\textcolor{jsonstr}{#1}}   % string
+\newcommand{\jn}[1]{\textcolor{jsonnum}{#1}}   % numero
+\newcommand{\jp}[1]{\textcolor{jsonpunct}{#1}} % pontuacao
 
 \graphicspath{{figures/}}
 

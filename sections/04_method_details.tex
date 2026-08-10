@@ -109,25 +109,29 @@ with dates (\texttt{202106}, \texttt{202206}) at iteration
 \texttt{5} goes to
 \texttt{iteration\_5/annotations/0000/202106\_202206.json}:
 
-\begin{verbatim}
-{
-  "format_version": "3.0-pool",
-  "image": {"name": "0000/202206.png",
-            "width": 1024, "height": 1024},
-  "iteration": 5,
-  "created_at": "2026-08-07T15:30:00Z",
-  "pair": {
-    "scene": "0000",
-    "date_before": "202106",
-    "date_after": "202206"
-  },
-  "annotations": [
-    [268, 339, 1],
-    [512, 480, 0],
-    [745, 621, 1]
-  ]
-}
-\end{verbatim}
+\begin{tcolorbox}[enhanced, colback=treebg, frame hidden, boxrule=0pt,
+    borderline west={2pt}{0pt}{jsonkey}, arc=1.5pt,
+    left=10pt, right=8pt, top=8pt, bottom=8pt]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\footnotesize]
+\jp{\{}
+  \jk{"format_version"}\jp{:} \js{"3.0-pool"}\jp{,}
+  \jk{"image"}\jp{:} \jp{\{}\jk{"name"}\jp{:} \js{"0000/202206.png"}\jp{,}
+            \jk{"width"}\jp{:} \jn{1024}\jp{,} \jk{"height"}\jp{:} \jn{1024}\jp{\}}\jp{,}
+  \jk{"iteration"}\jp{:} \jn{5}\jp{,}
+  \jk{"created_at"}\jp{:} \js{"2026-08-07T15:30:00Z"}\jp{,}
+  \jk{"pair"}\jp{:} \jp{\{}
+    \jk{"scene"}\jp{:} \js{"0000"}\jp{,}
+    \jk{"date_before"}\jp{:} \js{"202106"}\jp{,}
+    \jk{"date_after"}\jp{:} \js{"202206"}
+  \jp{\}}\jp{,}
+  \jk{"annotations"}\jp{:} \jp{[}
+    \jp{[}\jn{268}\jp{,} \jn{339}\jp{,} \jn{1}\jp{]}\jp{,}
+    \jp{[}\jn{512}\jp{,} \jn{480}\jp{,} \jn{0}\jp{]}\jp{,}
+    \jp{[}\jn{745}\jp{,} \jn{621}\jp{,} \jn{1}\jp{]}
+  \jp{]}
+\jp{\}}
+\end{Verbatim}
+\end{tcolorbox}
 
 A point is an entry of \texttt{annotations}: pixel coordinates and
 a class index. Anchoring the file to the pair preserves the
@@ -180,15 +184,15 @@ counters track the session, the scene, and the pair on screen.
 \subsection{Training in the loop}
 \label{sec:training}
 
-iSAGE-CD has no built-in trainer, by design. What the loop needs is
-a model in it, not a model inside the tool, and users of an
-annotation tool want to bring their own architecture. Training
-plugs in through a folder contract
-(Table~\ref{tab:iteration_folder}): a trainer reads the pair files
+iSAGE-CD deliberately ships without a trainer, because the loop
+needs a model in it rather than a model inside the tool, and users
+of an annotation tool want to bring their own architecture.
+Training plugs in through a folder contract
+(Table~\ref{tab:iteration_folder}). A trainer reads the pair files
 of \texttt{iteration\_N/annotations/} and writes checkpoints to
 \texttt{models/} and per-pair prediction PNGs to
-\texttt{predictions/}. Anything that honours this contract closes
-the loop, whatever the framework or the architecture.
+\texttt{predictions/}, so anything that honours this contract
+closes the loop, whatever the framework or the architecture.
 
 \begin{table}[!h]
 \centering
@@ -226,9 +230,8 @@ of the pair, not the training procedure.
 
 Each round of activity is stored in a numbered
 \texttt{iteration\_N/} subfolder
-(Table~\ref{tab:iteration_folder}).
-
-While annotating round $N$ the user sees the model of round $N-1$.
+(Table~\ref{tab:iteration_folder}), and while annotating round $N$
+the user sees the model of round $N-1$.
 The overlay for the pair on screen comes from
 \texttt{iteration\_\{N-1\}/predictions/<scene>/<before>\_<after>.png},
 so the surface under review is always the previous round's

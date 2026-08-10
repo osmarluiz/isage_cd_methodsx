@@ -2,38 +2,23 @@
 % LIMITATIONS
 % =============================================================
 
-The validation reported in this article is qualitative and limited
-to a single scene and a single event (the PRODES 2022 window over
-a subset of the Brazilian arc of deforestation). All annotations
-were placed by a single expert; no inter-annotator agreement, no
-comparison against dense supervision, and no held-out test set
-are provided. A quantitative evaluation with multiple annotators
-and against dense ground truth is the subject of a separate
-manuscript in preparation. Nothing in this article should be read
-as a scientific claim about deforestation detection accuracy; the
-validation establishes that the tool and the protocol produce
-usable output, not that the output is optimal.
+The session reported here covers a single scene, a single sensor,
+and one event window with two classes, so nothing in this article
+shows how the protocol behaves on other sensors or a larger class
+set. The label format also fixes the annotation unit at two dates,
+so a model that consumes a longer series at once falls outside it,
+even though a scene may hold many dates.
 
-The tool assumes that the two images of a pair share the same
-pixel grid. Co-registration and resampling are upstream concerns
-and are not addressed by iSAGE-CD. Similarly, only bi-temporal
-change (one reference and one frame per pair) is supported;
-multi-date time series would require an extension of the
-pair-anchored label format described in
-Section~\ref{sec:label_format}.
+The validation is qualitative and rests on one expert, with no
+dense-supervision baseline trained and no tiles held out, so the
+article establishes that the protocol produces output an expert
+accepts rather than that the output is accurate. A quantitative
+comparison against dense supervision and PRODES polygons is the
+subject of a separate manuscript in preparation.
 
-The interface is a local PyQt5 desktop application and was tested
-primarily on Windows. Training and prediction scripts are supplied
-separately from the annotator itself; users adopting iSAGE-CD for
-a different task must plug in their own training loop and their
-own inference script, both configured to produce the per-frame
-prediction PNGs in the class-index format described in
-Section~\ref{sec:iteration}.
-
-Finally, labels in iSAGE-CD are anchored to a pair rather than to
-an image, which means the same visual polygon may carry different
-labels under different references (for example, a cleared area
-may be \emph{new} against one before-image and \emph{old} against
-another). This is a design feature for change detection but is a
-semantic shift relative to conventional single-image annotation
-and should be accounted for when training analysts on the tool.
+The annotator is a local PyQt5 desktop application and was tested
+mostly on Windows. It ships without a trainer, so adopting it for
+a new task means supplying training and inference scripts that
+honour the folder contract of
+Table~\ref{tab:iteration_folder}, with the reference
+implementation of iSAGE as the shortest path to that.
