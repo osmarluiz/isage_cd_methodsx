@@ -25,6 +25,13 @@
 \newcommand{\jn}[1]{\textcolor{jsonnum}{#1}}   % numero
 \newcommand{\jp}[1]{\textcolor{jsonpunct}{#1}} % pontuacao
 
+% Caminhos longos em monoespacada que podem quebrar de linha
+% (argumento verbatim: nao precisa escapar _ nem < >)
+% (so quebra depois de / e _, nunca no meio de uma palavra)
+\DeclareUrlCommand\pth{\urlstyle{tt}%
+  \renewcommand{\UrlBreaks}{\do\/\do\_\do\>\do\.}%
+  \renewcommand{\UrlNoBreaks}{}}
+
 \graphicspath{{figures/}}
 
 \journal{MethodsX}

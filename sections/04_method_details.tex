@@ -17,7 +17,7 @@ runs inside a session, a directory structure that versions the
 dataset, the models, and the iterations automatically.
 
 % ------------------------------------------------------------------
-% FIGURE 1 — high-level pipeline diagram (TikZ, first pass)
+% FIGURE 1 - high-level pipeline diagram (TikZ, first pass)
 % ------------------------------------------------------------------
 \begin{figure}[htbp]
   \centering
@@ -73,8 +73,8 @@ Which two dates form a pair is not fixed at build time. Any
 scene with $n$ dates offers $n(n-1)/2$ of them.
 
 Two configuration files sit under \texttt{config/}.
-\texttt{session\_config.json} names the iteration the user is
-currently annotating. \texttt{dataset\_metadata.json} declares the
+\pth{session_config.json} names the iteration the user is
+currently annotating. \pth{dataset_metadata.json} declares the
 classes: how many there are, which index means ``unlabeled'', and,
 for each class, a name and a display colour. The interface, the
 label files, and the prediction overlays all read class semantics
@@ -107,7 +107,7 @@ Every click lands in a JSON file that belongs to one pair. The path
 is fully determined by the pair: a click on scene \texttt{0000}
 with dates (\texttt{202106}, \texttt{202206}) at iteration
 \texttt{5} goes to
-\texttt{iteration\_5/annotations/0000/202106\_202206.json}:
+\pth{iteration_5/annotations/0000/202106_202206.json}:
 
 \begin{tcolorbox}[enhanced, colback=treebg, frame hidden, boxrule=0pt,
     borderline west={2pt}{0pt}{jsonkey}, arc=1.5pt,
@@ -169,7 +169,7 @@ Labeling takes few gestures: a left click adds a point with the
 selected class, a right click near a point removes it, a drag
 fine-tunes its position, the wheel zooms, a middle-mouse drag pans.
 Point colours follow the class palette declared in
-\texttt{dataset\_metadata.json}.
+\pth{dataset_metadata.json}.
 
 Each canvas has a date selector. The before selector offers only
 dates earlier than the current after date, so an invalid pair
@@ -189,7 +189,7 @@ needs a model in it rather than a model inside the tool, and users
 of an annotation tool want to bring their own architecture.
 Training plugs in through a folder contract
 (Table~\ref{tab:iteration_folder}). A trainer reads the pair files
-of \texttt{iteration\_N/annotations/} and writes checkpoints to
+of \pth{iteration_N/annotations/} and writes checkpoints to
 \texttt{models/} and per-pair prediction PNGs to
 \texttt{predictions/}, so anything that honours this contract
 closes the loop, whatever the framework or the architecture.
@@ -233,19 +233,19 @@ Each round of activity is stored in a numbered
 (Table~\ref{tab:iteration_folder}), and while annotating round $N$
 the user sees the model of round $N-1$.
 The overlay for the pair on screen comes from
-\texttt{iteration\_\{N-1\}/predictions/<scene>/<before>\_<after>.png},
+\pth{iteration_{N-1}/predictions/<scene>/<before>_<after>.png},
 so the surface under review is always the previous round's
 predictions for that exact pair. Iteration 0 has no overlay.
 Prediction PNGs carry class indices matching
-\texttt{dataset\_metadata.json}, so points and predictions share
+\pth{dataset_metadata.json}, so points and predictions share
 one palette. The overlay opacity is adjustable and the \texttt{P}
 key shows it while held.
 
 Closing a round is the trainer's job
 (Section~\ref{sec:training}): it writes \texttt{models/} and
 \texttt{predictions/} of round $N$, creates
-\texttt{iteration\_\{N+1\}/annotations/}, and increments
-\texttt{current\_iteration}. The next session opens on the new
+\pth{iteration_{N+1}/annotations/}, and increments
+\pth{current_iteration}. The next session opens on the new
 round with the fresh predictions as the overlay.
 
 Because the annotation tree is the dataset, sharing a round between
