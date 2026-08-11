@@ -16,9 +16,11 @@ accepts rather than that the output is accurate. A quantitative
 comparison against dense supervision and PRODES polygons is the
 subject of a separate manuscript in preparation.
 
-The annotator is a local PyQt5 desktop application and was tested
-mostly on Windows. It ships without a trainer, so adopting it for
-a new task means supplying training and inference scripts that
-honour the folder contract of
+The annotator is a local PyQt5 desktop application, was tested
+mostly on Windows, and reads PNG in pixel coordinates, so imagery
+in other formats has to be converted and any georeferencing of the
+output is done downstream. It ships without a trainer, so adopting
+it for a new task means supplying training and inference scripts
+that honour the folder contract of
 Table~\ref{tab:iteration_folder}, with the reference
 implementation of iSAGE as the shortest path to that.

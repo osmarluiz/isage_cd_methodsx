@@ -93,9 +93,11 @@ python tools/build_session.py entrada/ \
 The script copies the dated images into \texttt{train/<scene>/},
 writes the two configuration files, and creates an empty
 \texttt{iteration\_0/} with the four subfolders above. The session
-is ready to open. The tool assumes all images of a scene share one
-pixel grid, so co-registration and resampling are upstream
-concerns.
+is ready to open. The tool reads PNG and works in pixel
+coordinates, with no notion of a coordinate reference system, so
+co-registration, resampling and any georeferencing of the results
+are upstream and downstream concerns. All images of a scene are
+assumed to share one pixel grid.
 
 % -------------------------------------------------------------
 % 4.3 Pair-anchored label format
@@ -177,6 +179,11 @@ cannot be selected, and changing either date switches the point set
 on both canvases. Dates already annotated are marked with a bullet,
 a scene opens on its most recently annotated pair, and live
 counters track the session, the scene, and the pair on screen.
+
+The two selectors move within a scene. Moving between scenes is
+the arrow keys, or the previous and next buttons below the
+canvases, and a scene can also be reached by its index. Leaving a
+scene needs no confirmation, since every click is already on disk.
 
 % -------------------------------------------------------------
 % 4.5 Training in the loop
