@@ -53,13 +53,16 @@ way, the expert ran five iterations of the click-train-predict
 loop.
 
 Figure~\ref{fig:pointsperiter} shows how that effort was spent
-across the iterations. The cold-start pass of v1 carried the bulk
-of the clicks, 54{,}913 points on Block~A. Rounds v2 and v4 were
-short refinement passes that added only 205 and 131 points. Round
-v3 extended the annotation to the second half of Block~A and
-nearly doubled the pool with 38{,}318 further points, and v5
-introduced Block~B with another 49{,}925 on a previously unseen
-tile set. The pool available to the last model is 143{,}492
+across the iterations. The rounds are very unequal, from 54{,}913
+points in v1 down to 131 in v4, because the expert retrained
+whenever it seemed useful rather than on a schedule or a click
+budget. The size of a round therefore records how much work
+happened to be done before the next training run, not a designed
+allocation. Round v1 was the cold-start pass over Block~A, v3
+extended the annotation to the second half of Block~A and nearly
+doubled the pool with 38{,}318 further points, and v5 introduced
+Block~B with another 49{,}925 on a previously unseen tile set.
+The pool available to the last model is 143{,}492
 distinct labeled pixels, 65{,}170 of them \emph{change} and
 78{,}322 \emph{no change}, so the supervision stays close to
 balanced even though change covers a small fraction of the scene.
