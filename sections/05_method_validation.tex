@@ -43,27 +43,27 @@ target number of iterations was set in advance, and no validation
 or test tiles were held out. The session was a production
 annotation effort rather than a controlled experiment, so every
 labeled tile feeds training, which is how the loop runs in real
-use. In total, 1999 of the 2000 tiles received at least one point
-and 143{,}634 clicks were placed, with a median of 43 points per
-tile (min 3, max 702) and an approximately balanced class split
-(54.6\% \emph{no change}, 45.4\% \emph{change}). These points
-cover 0.007\% of the roughly $2.1\times10^{9}$ pixels in the
+use. In total, the expert labeled 143{,}492 pixels across 1999 of
+the 2000 tiles, with a median of 43 per tile (min 3, max 702) and
+an approximately balanced class split (54.6\% \emph{no change},
+45.4\% \emph{change}). Those pixels
+cover 0.007\% of the roughly $2.1\times10^{9}$ in the
 session, about one labeled pixel in every 14{,}600. Working this
 way, the expert ran five iterations of the click-train-predict
 loop.
 
 Table~\ref{tab:rounds} shows how that effort was spent
 across the iterations. The rounds are very unequal, from 54{,}913
-points in v1 down to 131 in v4, because the expert retrained
+labeled pixels in v1 down to 131 in v4, because the expert retrained
 whenever it seemed useful rather than on a schedule or a click
 budget. The size of a round therefore records how much work
 happened to be done before the next training run, not a designed
 allocation. Round v1 was the cold-start pass over Block~A, v3
 extended the annotation to the second half of Block~A and nearly
-doubled the pool with 38{,}318 further points, and v5 introduced
+doubled the pool with 38{,}318 further pixels, and v5 introduced
 Block~B with another 49{,}925 on a previously unseen tile set.
-The pool available to the last model is 143{,}492
-distinct labeled pixels, 65{,}170 of them \emph{change} and
+The pool available to the last model is therefore the whole
+143{,}492, 65{,}170 of them \emph{change} and
 78{,}322 \emph{no change}, so the supervision stays close to
 balanced even though change covers a small fraction of the scene.
 
@@ -118,7 +118,7 @@ sequence is not monotone. In that same tile the model of v2, which
 the figure omits, covers more of it than v1 before v3 corrects it,
 so a round can move the model the wrong way before the next one
 recovers. And v5 changes little
-on these tiles, which is expected because the points it added lie
+on these tiles, which is expected because the labels it added lie
 on Block~B, so the Block~A supervision seen by v5 is the same the
 model already had at v4. We do not compare against a
 dense-supervision baseline here, and a rigorous quantitative
@@ -132,11 +132,10 @@ evaluation is the subject of a separate manuscript in preparation.
     as typical ones. Columns: PlanetScope T1 (before), PlanetScope
     T2 (after), and the prediction of models v1, v3 and v5 in red
     over a dimmed T2. Rounds v2 and v4 are omitted because they
-    added 205 and 131 points and leave the footprint almost
+    added 205 and 131 labeled pixels and leave the footprint almost
     unchanged. Rows: a consolidated clearing, a fragmented
     clearing, a small clearing, and a water tile that v1 covers
-    with a false footprint. Per-row change percentages come from
-    the PRODES-aligned reference used to stratify the tile grid.}
+    with a false footprint.}
   \label{fig:tiles}
 \end{figure}
 
