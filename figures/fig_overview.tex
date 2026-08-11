@@ -1,47 +1,7 @@
 % =============================================================
-% Figure 1 (fig:overview) — iSAGE-CD pipeline
-% (a) interface screenshot, full width; (b) the iteration loop as a
-% horizontal chain of the same width. The session tree is NOT
-% repeated here: it lives in the Session structure subsection.
-% Tags (a)(b) are the only text besides panel content.
+% Figure 1 (fig:overview) — a interface rodando
+% O loop de iteracao saiu daqui: ele e o graphical abstract
+% (figures/graphical_abstract.tex) e a Tabela 1 ja descreve o ciclo
+% em termos de quem produz e quem consome cada pasta.
 % =============================================================
-\resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[
-  font=\sffamily\footnotesize,
-  panel/.style={draw=black!30, line width=0.4pt, inner sep=0pt},
-  tag/.style={font=\sffamily\small, inner sep=2pt},
-  loopbox/.style={draw=black!30, line width=0.4pt, rounded corners=2pt,
-                  fill=treebg, minimum width=2.9cm, minimum height=1.05cm,
-                  align=center, inner sep=2pt},
-  looparr/.style={-{Latex[length=2.2mm]}, line width=0.9pt,
-                  draw=treefolder},
-]
-
-% ---------------------------------------------------------------- (a)
-\node[panel] (A) at (0, 0)
-     {\includegraphics[width=15.4cm]{figures/screenshot_ui.png}};
-\node[tag, anchor=south west] at ($(A.north west) + (-2pt, 1pt)$) {(a)};
-
-% ---------------------------------------------------------------- (b)
-\node[panel, minimum width=15.4cm, minimum height=3.1cm,
-      below=4mm of A.south west, anchor=north west] (B) {};
-\node[tag, anchor=south west] at ($(B.north west) + (-2pt, 1pt)$) {(b)};
-
-\coordinate (bc) at ($(B.center) + (0, 0.28)$);
-\node[loopbox] (an) at ($(bc) + (-5.55, 0)$)
-     {annotate\\[-1pt]{\tiny\color{treecomment}clicks on a pair}};
-\node[loopbox] (tr) at ($(bc) + (-1.85, 0)$)
-     {train\\[-1pt]{\tiny\color{treecomment}error-weighted}};
-\node[loopbox] (pr) at ($(bc) + ( 1.85, 0)$)
-     {predict\\[-1pt]{\tiny\color{treecomment}per pair}};
-\node[loopbox] (re) at ($(bc) + ( 5.55, 0)$)
-     {review\\[-1pt]{\tiny\color{treecomment}model errors}};
-
-\draw[looparr] (an) -- (tr);
-\draw[looparr] (tr) -- (pr);
-\draw[looparr] (pr) -- (re);
-\draw[looparr] (re.south) -- ++(0, -0.62)
-      -| ($(an.south) + (0, -0.62)$) -- (an.south);
-
-\end{tikzpicture}%
-}
+\includegraphics[width=\linewidth]{figures/screenshot_ui.png}

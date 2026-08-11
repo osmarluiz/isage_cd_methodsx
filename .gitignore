@@ -23,3 +23,7 @@ build/
 .overleaf/
 tools_scratch/*
 *.spl
+
+# Graphical abstract: intermediarios do standalone
+figures/graphical_abstract.aux
+figures/graphical_abstract.log
