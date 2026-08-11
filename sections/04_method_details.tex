@@ -188,8 +188,8 @@ iSAGE-CD deliberately ships without a trainer, because the loop
 needs a model in it rather than a model inside the tool, and users
 of an annotation tool want to bring their own architecture.
 Training plugs in through a folder contract
-(Table~\ref{tab:iteration_folder}). A trainer reads the pair files
-of \pth{iteration_N/annotations/} and writes checkpoints to
+(Table~\ref{tab:iteration_folder}). A trainer reads the masks of
+\pth{iteration_N/masks/} and writes checkpoints to
 \texttt{models/} and per-pair prediction PNGs to
 \texttt{predictions/}, so anything that honours this contract
 closes the loop, whatever the framework or the architecture.
@@ -208,14 +208,23 @@ Subfolder            & Produced by                        & Consumed by \\
 \texttt{annotations/} & user clicks during round $N$      & training script at end of round $N$ \\
 \texttt{models/}      & training script                   & prediction script \\
 \texttt{predictions/} & prediction script                 & overlay shown in round $N{+}1$ \\
-\texttt{masks/}       & optional dense-mask utilities     & external evaluation \\
+\texttt{masks/}       & \pth{tools/rasterize.py}          & training script \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+What the trainer needs from the clicks is a per-pixel target, and
+one helper produces it. \pth{tools/rasterize.py} reads the pair
+files of a round and writes one mask per pair into
+\pth{iteration_N/masks/}, giving each clicked pixel its class index
+and every other pixel the \pth{ignore_index} declared in
+\pth{dataset_metadata.json}. A loss that honours that value scores
+only the pixels a human actually looked at, which is what makes
+the supervision sparse rather than wrong.
+
 The reference protocol is inherited from iSAGE~\cite{isage}. The
-two images of the pair are stacked as input channels and the
-points are the sparse targets. The model is
+two images of the pair are stacked as input channels and the masks
+are the sparse targets. The model is
 trained with an error-weighted loss that amplifies the gradient at
 each labeled pixel, and nothing is inserted between the clicks and
 the loss: no pseudo-labels, no conditional random fields, no
