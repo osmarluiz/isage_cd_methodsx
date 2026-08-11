@@ -100,13 +100,13 @@ sees dated images, a class definition, and pairs, whatever the
 sensor, the theme, or the model.
 
 The effect of the rounds is visible on the predictions themselves.
-Figure~\ref{fig:iterprogression} shows four Block~A tiles picked
-for the visibility of that effect, the ones where successive
-iterations disagree the most rather than tiles where every round
-already agreed. The clearest case is the bottom row, a tile of
-open water with a forested strip, where v1 and v2 flood most of
+Figure~\ref{fig:tiles} shows four Block~A tiles under the models of
+v1, v3 and v5, picked for the visibility of that effect, the ones
+where successive rounds disagree the most rather than tiles where
+every round already agreed. The clearest case is the bottom row, a
+tile of open water with a forested strip, where v1 floods most of
 the tile with a false change footprint and v3 removes it almost
-entirely, after which v4 and v5 leave the tile alone. The other
+entirely, after which v5 leaves the tile alone. The other
 three rows move less and in smaller steps, mostly tightening
 edges and filling fragments. Across the four tiles the corrections
 concentrate at v3, the round that completed Block~A, which is also
@@ -114,9 +114,10 @@ where the annotation pool nearly doubled
 (Table~\ref{tab:rounds}).
 
 Two things are worth stating plainly about this panel. The
-sequence is not monotone, and in the bottom row v2 covers more of
-the tile than v1 before v3 corrects it, so a round can move the
-model the wrong way before the next one recovers. And v5 changes little
+sequence is not monotone. In that same tile the model of v2, which
+the figure omits, covers more of it than v1 before v3 corrects it,
+so a round can move the model the wrong way before the next one
+recovers. And v5 changes little
 on these tiles, which is expected because the points it added lie
 on Block~B, so the Block~A supervision seen by v5 is the same the
 model already had at v4. We do not compare against a
@@ -125,17 +126,18 @@ evaluation is the subject of a separate manuscript in preparation.
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=\linewidth]{figures/fig_iteration_progression.pdf}
-  \caption{The predicted change footprint of every round on four
-    Block~A tiles, chosen as the tiles where the rounds disagree
-    most rather than as typical ones. Columns: PlanetScope T1
-    (before), PlanetScope T2 (after), and the prediction of models
-    v1 to v5 in red over a dimmed T2. Rows: a consolidated
-    clearing, a fragmented clearing, a small clearing, and a water
-    tile that v1 and v2 cover with a false footprint. Per-row
-    change percentages come from the PRODES-aligned reference used
-    to stratify the tile grid.}
-  \label{fig:iterprogression}
+  \includegraphics[width=\linewidth]{figures/fig_tiles.png}
+  \caption{The predicted change footprint on four Block~A tiles,
+    chosen as the tiles where the rounds disagree most rather than
+    as typical ones. Columns: PlanetScope T1 (before), PlanetScope
+    T2 (after), and the prediction of models v1, v3 and v5 in red
+    over a dimmed T2. Rounds v2 and v4 are omitted because they
+    added 205 and 131 points and leave the footprint almost
+    unchanged. Rows: a consolidated clearing, a fragmented
+    clearing, a small clearing, and a water tile that v1 covers
+    with a false footprint. Per-row change percentages come from
+    the PRODES-aligned reference used to stratify the tile grid.}
+  \label{fig:tiles}
 \end{figure}
 
 % -------------------------------------------------------------

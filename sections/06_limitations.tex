@@ -12,9 +12,14 @@ even though a scene may hold many dates.
 The validation is qualitative and rests on one expert, with no
 dense-supervision baseline trained and no tiles held out, so the
 article establishes that the protocol produces output an expert
-accepts rather than that the output is accurate. A quantitative
-comparison against dense supervision and PRODES polygons is the
-subject of a separate manuscript in preparation.
+accepts rather than that the output is accurate. The expert also
+stopped when the predictions looked good enough to him, so the
+loop ends on judgement and not on a criterion, and the tool
+neither ranks tiles nor proposes where the next click should go.
+What the session records is how one annotator worked with the
+tool, not a measured annotation policy. A quantitative comparison
+against dense supervision and PRODES polygons is the subject of a
+separate manuscript in preparation.
 
 The annotator is a local PyQt5 desktop application, was tested
 mostly on Windows, and reads PNG in pixel coordinates, so imagery
