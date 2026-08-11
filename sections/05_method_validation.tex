@@ -10,10 +10,11 @@
 
 We validated iSAGE-CD by running a working annotation session over
 a scene of the Brazilian Amazon in the region of the deforestation
-arc. The imagery is PlanetScope surface reflectance~\cite{nicfi2021basemaps} in four
-bands (blue, green, red, near infrared) at 3\,m ground sample
-distance, and the scene is diced into 2000 tiles of
-$1024 \times 1024$ pixels.
+arc. The imagery is PlanetScope surface reflectance from the NICFI
+basemaps for the tropics~\cite{nicfi2021basemaps} in four bands
+(blue, green, red, near infrared), delivered in Web Mercator
+(EPSG:3857) at a pixel size of 4.77\,m, and the scene is diced into
+2000 tiles of $1024 \times 1024$ pixels.
 Two class indices are used: \emph{no change} and \emph{change}
 (deforestation between the two dates), consistent with the binary
 supervision that operational deforestation products such as
@@ -44,10 +45,8 @@ or test tiles were held out. The session was a production
 annotation effort rather than a controlled experiment, so every
 labeled tile feeds training, which is how the loop runs in real
 use. In total, the expert labeled 143{,}492 pixels across 1999 of
-the 2000 tiles, with a median of 43 per tile (min 3, max 702) and
-an approximately balanced class split (54.6\% \emph{no change},
-45.4\% \emph{change}). Those pixels
-cover 0.007\% of the roughly $2.1\times10^{9}$ in the
+the 2000 tiles, with a median of 43 per tile (min 3, max 702).
+Those pixels cover 0.007\% of the roughly $2.1\times10^{9}$ in the
 session, about one labeled pixel in every 14{,}600. Working this
 way, the expert ran five iterations of the click-train-predict
 loop.
@@ -70,15 +69,17 @@ balanced even though change covers a small fraction of the scene.
 \begin{table}[!h]
 \centering
 \small
-\caption{Annotation effort per round in the Amazon session. Tiles
-is the number of tiles the round could draw on (Block~B enters at
-v5), added is the number of labeled pixels the round contributed,
-split into the two classes, and pool is the supervision available
-to the model trained at the end of that round.}
+\caption{Annotation effort per round in the Amazon session.
+\emph{Tiles available} is how many tiles the round could draw on,
+not how many it labeled: Block~B enters at v5 and takes the pool
+from 1000 to 2000. \emph{Added} is the number of labeled pixels the
+round contributed, split into the two classes, and \emph{pool} is
+the supervision available to the model trained at the end of that
+round.}
 \label{tab:rounds}
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-Round & Tiles & Added & \emph{change} & \emph{no change} & Pool \\
+Round & Tiles available & Added & \emph{change} & \emph{no change} & Pool \\
 \midrule
 v1 & 1000 & 54{,}913 & 25{,}204 & 29{,}709 & 54{,}913 \\
 v2 & 1000 &      205 &        0 &      205 & 55{,}118 \\
@@ -120,9 +121,7 @@ so a round can move the model the wrong way before the next one
 recovers. And v5 changes little
 on these tiles, which is expected because the labels it added lie
 on Block~B, so the Block~A supervision seen by v5 is the same the
-model already had at v4. We do not compare against a
-dense-supervision baseline here, and a rigorous quantitative
-evaluation is the subject of a separate manuscript in preparation.
+model already had at v4.
 
 \begin{figure}[!h]
   \centering
@@ -154,8 +153,8 @@ annotations placed by the expert, and the v5 prediction overlaid
 on the after image. The tiles were chosen to span the recurring
 patterns of the arc of deforestation: a large consolidated
 clearing, a fragmented clearing with edges and remnant vegetation
-islands, an intrusion along an unpaved road, and a control tile
-dominated by standing forest without recent change.
+islands, a clearing whose edge is drawn by a watercourse, and a
+control tile dominated by standing forest without recent change.
 
 \begin{figure}[!h]
   \centering
@@ -184,8 +183,8 @@ optimize, and the loop stops when the expert, reviewing the
 predictions of the current round, is satisfied that the dataset
 supports its intended use. That point was reached at v5. Visual
 inspection is not a substitute for a quantitative comparison with
-dense supervision or with PRODES polygons, and we do not claim
-otherwise here. What the qualitative panel does establish is that
+dense supervision or with PRODES polygons. What the qualitative
+panel does establish is that
 a working session run through the iSAGE-CD tool, with the protocol
 described in Section~\ref{sec:overview} onward, produces per-tile
 predictions that a domain expert can inspect and accept, and that
