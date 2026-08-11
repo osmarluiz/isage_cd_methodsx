@@ -103,7 +103,7 @@ python anotar.py --session Sessions/CD
 \end{verbatim}
 
 \noindent
-opens it; with no \texttt{-{}-session} the annotator looks for
+opens it. With no \texttt{-{}-session} the annotator looks for
 \texttt{Sessions/CD} beside the program, and \texttt{-{}-iteration}
 opens a round other than the current one. The tool reads PNG and
 works in pixel
@@ -195,8 +195,9 @@ counters track the session, the scene, and the pair on screen.
 
 The two selectors move within a scene. Moving between scenes is
 the arrow keys, or the previous and next buttons below the
-canvases, and a scene can also be reached by its index. Leaving a
-scene needs no confirmation, since every click is already on disk.
+canvases, and a scene can also be reached by its index. Every
+click is already on disk, so leaving a scene needs no
+confirmation.
 
 % -------------------------------------------------------------
 % 4.5 Training in the loop
@@ -210,7 +211,7 @@ of an annotation tool want to bring their own architecture.
 Training plugs in through a folder contract
 (Table~\ref{tab:iteration_folder}) as two scripts. The training
 script reads the masks of \pth{iteration_N/masks/} and writes
-checkpoints to \texttt{models/}; the inference script reads those
+checkpoints to \texttt{models/}. The inference script reads those
 checkpoints and writes per-pair prediction PNGs to
 \texttt{predictions/}. Anything that honours this contract
 closes the loop, whatever the framework or the architecture.
@@ -219,9 +220,9 @@ closes the loop, whatever the framework or the architecture.
 \centering
 \small
 \caption{Contents of a single \texttt{iteration\_N/} folder. Each
-subfolder has exactly one writer and one reader, and the rows read
-as a chain: the reader of each row is the writer of the next, and
-the last returns to the annotator, closing the loop. The annotator
+subfolder has exactly one writer and one reader, and the reader of
+each row is the writer of the next, so the last row returns to the
+annotator and closes the loop. The annotator
 and \texttt{tools/rasterize.py} ship with iSAGE-CD, and the
 training and inference scripts are the user's.}
 \label{tab:iteration_folder}
@@ -237,14 +238,14 @@ Subfolder            & Written by                    & Read by \\
 \end{tabular}
 \end{table}
 
-What the training script needs from the clicks is a per-pixel target, and
-one helper produces it. \pth{tools/rasterize.py} reads the pair
+The training script needs a per-pixel target, and one helper
+produces it. \pth{tools/rasterize.py} reads the pair
 files of a round and writes one mask per pair into
 \pth{iteration_N/masks/}, giving each clicked pixel its class index
 and every other pixel the \pth{ignore_index} declared in
 \pth{dataset_metadata.json}. A loss that honours that value scores
-only the pixels a human actually looked at, which is what makes
-the supervision sparse rather than wrong.
+only the pixels a human actually looked at, so the unlabeled ones
+cost nothing instead of counting as background.
 
 The reference protocol is inherited from iSAGE~\cite{isage}. The
 two images of the pair are stacked as input channels and the masks
