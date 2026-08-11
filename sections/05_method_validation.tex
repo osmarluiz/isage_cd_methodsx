@@ -52,7 +52,7 @@ session, about one labeled pixel in every 14{,}600. Working this
 way, the expert ran five iterations of the click-train-predict
 loop.
 
-Figure~\ref{fig:pointsperiter} shows how that effort was spent
+Table~\ref{tab:rounds} shows how that effort was spent
 across the iterations. The rounds are very unequal, from 54{,}913
 points in v1 down to 131 in v4, because the expert retrained
 whenever it seemed useful rather than on a schedule or a click
@@ -67,16 +67,27 @@ distinct labeled pixels, 65{,}170 of them \emph{change} and
 78{,}322 \emph{no change}, so the supervision stays close to
 balanced even though change covers a small fraction of the scene.
 
-\begin{figure}[!h]
-  \centering
-  \includegraphics[width=\linewidth]{figures/fig_points_per_iter.pdf}
-  \caption{Annotation effort across the five iterations of the
-    Amazon session. (a)~Points added at each round, stacked by
-    class (red $=$ \emph{change}, green $=$ \emph{no change}), with
-    the round total above each bar. (b)~Cumulative pool available
-    for training at the end of each round.}
-  \label{fig:pointsperiter}
-\end{figure}
+\begin{table}[!h]
+\centering
+\small
+\caption{Annotation effort per round in the Amazon session. Tiles
+is the number of tiles the round could draw on (Block~B enters at
+v5), added is the number of labeled pixels the round contributed,
+split into the two classes, and pool is the supervision available
+to the model trained at the end of that round.}
+\label{tab:rounds}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Round & Tiles & Added & \emph{change} & \emph{no change} & Pool \\
+\midrule
+v1 & 1000 & 54{,}913 & 25{,}204 & 29{,}709 & 54{,}913 \\
+v2 & 1000 &      205 &        0 &      205 & 55{,}118 \\
+v3 & 1000 & 38{,}318 & 12{,}798 & 25{,}520 & 93{,}436 \\
+v4 & 1000 &      131 &       36 &       95 & 93{,}567 \\
+v5 & 2000 & 49{,}925 & 27{,}132 & 22{,}793 & 143{,}492 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Training instantiated the reference protocol of
 Section~\ref{sec:training}: a U-Net with an EfficientNet-B7
@@ -100,12 +111,12 @@ three rows move less and in smaller steps, mostly tightening
 edges and filling fragments. Across the four tiles the corrections
 concentrate at v3, the round that completed Block~A, which is also
 where the annotation pool nearly doubled
-(Fig.~\ref{fig:pointsperiter}a).
+(Table~\ref{tab:rounds}).
 
 Two things are worth stating plainly about this panel. The
-sequence is not monotone: in the bottom row v2 covers more of the
-tile than v1 before v3 corrects it, so a round can move the model
-the wrong way before the next one recovers. And v5 changes little
+sequence is not monotone, and in the bottom row v2 covers more of
+the tile than v1 before v3 corrects it, so a round can move the
+model the wrong way before the next one recovers. And v5 changes little
 on these tiles, which is expected because the points it added lie
 on Block~B, so the Block~A supervision seen by v5 is the same the
 model already had at v4. We do not compare against a
