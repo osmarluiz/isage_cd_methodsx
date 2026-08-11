@@ -85,38 +85,42 @@ a choice of this session, not a constant of the software: the tool
 sees dated images, a class definition, and pairs, whatever the
 sensor, the theme, or the model.
 
-We do not compare against a dense-supervision baseline here, and a
-rigorous quantitative evaluation is the subject of a separate
-manuscript in preparation.
+The effect of the rounds is visible on the predictions themselves.
+Figure~\ref{fig:iterprogression} shows four Block~A tiles picked
+for the visibility of that effect, the ones where successive
+iterations disagree the most rather than tiles where every round
+already agreed. The clearest case is the bottom row, a tile of
+open water with a forested strip, where v1 and v2 flood most of
+the tile with a false change footprint and v3 removes it almost
+entirely, after which v4 and v5 leave the tile alone. The other
+three rows move less and in smaller steps, mostly tightening
+edges and filling fragments. Across the four tiles the corrections
+concentrate at v3, the round that completed Block~A, which is also
+where the annotation pool nearly doubled
+(Fig.~\ref{fig:pointsperiter}a).
 
-The iteration-by-iteration effect is visible directly on the
-predictions. Figure~\ref{fig:iterprogression} shows four Block~A
-tiles picked for the visibility of that effect (they are the tiles
-where successive iterations disagree the most, not tiles where
-every iteration was already close to convergence). Reading each
-row left to right, one can see how the predicted change footprint
-is refined as points accumulate: v1 already captures the dominant
-clearings but oversegments edges and, in one case, produces a
-large spurious activation over a mostly forested tile that later
-rounds progressively clean up (bottom row). The strongest
-corrections happen at v3, which folded in the second half of
-Block~A, and at v5, which introduced Block~B. The refinement
-rounds v2 and v4 mostly touch up edges, consistent with the small
-number of points added at those steps (Fig.~\ref{fig:pointsperiter}a).
+Two things are worth stating plainly about this panel. The
+sequence is not monotone: in the bottom row v2 covers more of the
+tile than v1 before v3 corrects it, so a round can move the model
+the wrong way before the next one recovers. And v5 changes little
+on these tiles, which is expected because the points it added lie
+on Block~B, so the Block~A supervision seen by v5 is the same the
+model already had at v4. We do not compare against a
+dense-supervision baseline here, and a rigorous quantitative
+evaluation is the subject of a separate manuscript in preparation.
 
 \begin{figure}[!h]
   \centering
   \includegraphics[width=\linewidth]{figures/fig_iteration_progression.pdf}
-  \caption{Iteration-by-iteration progression of the model
-    predictions on four Block~A tiles chosen for maximal
-    iteration-to-iteration variation. Columns: PlanetScope T1
-    (before), PlanetScope T2 (after), and the predicted change
-    footprint of models v1--v5 overlaid on a dimmed T2 (opaque
-    red). Rows: a consolidated clearing, a fragmented clearing, a
-    small clearing, and a case of spurious activation being cleaned
-    up over successive rounds (bottom row). Per-row change
-    percentages come from the PRODES-aligned reference used to
-    stratify the tile grid.}
+  \caption{The predicted change footprint of every round on four
+    Block~A tiles, chosen as the tiles where the rounds disagree
+    most rather than as typical ones. Columns: PlanetScope T1
+    (before), PlanetScope T2 (after), and the prediction of models
+    v1 to v5 in red over a dimmed T2. Rows: a consolidated
+    clearing, a fragmented clearing, a small clearing, and a water
+    tile that v1 and v2 cover with a false footprint. Per-row
+    change percentages come from the PRODES-aligned reference used
+    to stratify the tile grid.}
   \label{fig:iterprogression}
 \end{figure}
 
