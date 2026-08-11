@@ -68,7 +68,7 @@ of the quality of dense labeling, but the framework does not model
 the bi-temporal case where a label is anchored to a pair of dates.
 We introduce iSAGE-CD, an extension of iSAGE to change detection
 built around three design choices: labels are anchored to a
-(reference, frame) pair rather than to a single image; the
+(before, after) date pair rather than to a single image; the
 annotator shows two synchronized canvases so that a click on
 either date lands the point on both; and the annotation tree is
 the dataset itself, with no separate export step.
@@ -78,10 +78,9 @@ of the Brazilian Amazon covering the PRODES 2022 window
 by a single expert who ran five iterations of the
 click-train-predict loop, labeling 143{,}492 pixels, under
 0.007\% of those in the session.
-The training loss converges to a stable regime across all
-iterations, and the resulting per-tile predictions are
-qualitatively coherent with the observable change on
-representative tiles.
+Successive rounds visibly correct the predicted change, and the
+final per-tile predictions are qualitatively coherent with the
+observable change on representative tiles.
 Full quantitative evaluation against dense supervision and PRODES
 is the subject of a separate manuscript in preparation.
 iSAGE-CD is released under CC BY 4.0 at

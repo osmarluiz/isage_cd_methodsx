@@ -93,8 +93,10 @@ v5 & 2000 & 49{,}925 & 27{,}132 & 22{,}793 & 143{,}492 \\
 Training instantiated the reference protocol of
 Section~\ref{sec:training}: a U-Net with an EfficientNet-B7
 encoder over eight-channel stacks of the two dates, the
-error-weighted loss of iSAGE, and 150 epochs per round with a warm
-start from the previous best model. Full-image predictions used a
+error-weighted loss of iSAGE, and a warm start from the previous
+best model. Rounds ran to convergence rather than to a fixed
+budget, from 21 epochs in v2 to 151 in v4, 620 in total.
+Full-image predictions used a
 sliding window of 1024 pixels with 50\% overlap. Each of those is
 a choice of this session, not a constant of the software: the tool
 sees dated images, a class definition, and pairs, whatever the

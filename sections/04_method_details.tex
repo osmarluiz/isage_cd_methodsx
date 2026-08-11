@@ -222,8 +222,8 @@ closes the loop, whatever the framework or the architecture.
 subfolder has exactly one writer and one reader, and the rows read
 as a chain: the reader of each row is the writer of the next, and
 the last returns to the annotator, closing the loop. The annotator
-and \pth{tools/rasterize.py} ship with iSAGE-CD; the training and
-inference scripts are the user's.}
+and \texttt{tools/rasterize.py} ship with iSAGE-CD, and the
+training and inference scripts are the user's.}
 \label{tab:iteration_folder}
 \begin{tabular}{@{}lll@{}}
 \toprule
@@ -274,9 +274,9 @@ Prediction PNGs carry class indices matching
 one palette. The overlay opacity is adjustable and the \texttt{P}
 key shows it while held.
 
-Closing a round is the job of the training and inference scripts
-(Section~\ref{sec:training}): they write \texttt{models/} and
-\texttt{predictions/} of round $N$, create
+The training and inference scripts of
+Section~\ref{sec:training} close the round. They write
+\texttt{models/} and \texttt{predictions/} of round $N$, create
 \pth{iteration_{N+1}/annotations/}, and increment
 \pth{current_iteration}. The next session opens on the new
 round with the fresh predictions as the overlay.
