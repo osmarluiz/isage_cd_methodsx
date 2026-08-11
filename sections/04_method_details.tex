@@ -16,6 +16,11 @@ where they expect the most benefit, usually error regions. The loop
 runs inside a session, a directory structure that versions the
 dataset, the models, and the iterations automatically.
 
+iSAGE-CD is a desktop application written in Python. It needs
+Python~3.10 or later and five packages (PyQt5, NumPy, Pillow,
+imageio and SciPy), which \texttt{pip install -r requirements.txt}
+installs from the cloned repository.
+
 % ------------------------------------------------------------------
 % FIGURE 1 - high-level pipeline diagram (TikZ, first pass)
 % ------------------------------------------------------------------
@@ -59,7 +64,7 @@ artefacts:
 .3 \treedir{annotations/}\DTcomment{one folder per scene, JSON per pair}.
 .3 \treedir{predictions/}\DTcomment{per-pair prediction PNGs}.
 .3 \treedir{models/}\DTcomment{trained checkpoints}.
-.3 \treedir{masks/}\DTcomment{optional dense masks}.
+.3 \treedir{masks/}\DTcomment{rasterised sparse targets}.
 .2 \treedir{iteration\_1/} \ldots.
 }
 \end{tcolorbox}
@@ -85,14 +90,23 @@ co-registered images, plus a classes file (a JSON list of
 name and color in index order):
 
 \begin{verbatim}
-python tools/build_session.py entrada/ \
+python tools/build_session.py input/ \
     --classes classes.json --out Sessions/CD
 \end{verbatim}
 
 The script copies the dated images into \texttt{train/<scene>/},
 writes the two configuration files, and creates an empty
-\texttt{iteration\_0/} with the four subfolders above. The session
-is ready to open. The tool reads PNG and works in pixel
+\texttt{iteration\_0/} with the four subfolders above.
+
+\begin{verbatim}
+python anotar.py --session Sessions/CD
+\end{verbatim}
+
+\noindent
+opens it; with no \texttt{-{}-session} the annotator looks for
+\texttt{Sessions/CD} beside the program, and \texttt{-{}-iteration}
+opens a round other than the current one. The tool reads PNG and
+works in pixel
 coordinates, with no notion of a coordinate reference system, so
 co-registration, resampling and any georeferencing of the results
 are upstream and downstream concerns. All images of a scene are
@@ -194,32 +208,36 @@ iSAGE-CD deliberately ships without a trainer, because the loop
 needs a model in it rather than a model inside the tool, and users
 of an annotation tool want to bring their own architecture.
 Training plugs in through a folder contract
-(Table~\ref{tab:iteration_folder}). A trainer reads the masks of
-\pth{iteration_N/masks/} and writes checkpoints to
-\texttt{models/} and per-pair prediction PNGs to
-\texttt{predictions/}, so anything that honours this contract
+(Table~\ref{tab:iteration_folder}) as two scripts. The training
+script reads the masks of \pth{iteration_N/masks/} and writes
+checkpoints to \texttt{models/}; the inference script reads those
+checkpoints and writes per-pair prediction PNGs to
+\texttt{predictions/}. Anything that honours this contract
 closes the loop, whatever the framework or the architecture.
 
 \begin{table}[!h]
 \centering
 \small
 \caption{Contents of a single \texttt{iteration\_N/} folder. Each
-subfolder has a single producer and a single consumer, and together
-they close the annotate/train/predict/review loop.}
+subfolder has exactly one writer and one reader, and the rows read
+as a chain: the reader of each row is the writer of the next, and
+the last returns to the annotator, closing the loop. The annotator
+and \pth{tools/rasterize.py} ship with iSAGE-CD; the training and
+inference scripts are the user's.}
 \label{tab:iteration_folder}
 \begin{tabular}{@{}lll@{}}
 \toprule
-Subfolder            & Produced by                        & Consumed by \\
+Subfolder            & Written by                    & Read by \\
 \midrule
-\texttt{annotations/} & user clicks during round $N$      & training script at end of round $N$ \\
-\texttt{models/}      & training script                   & prediction script \\
-\texttt{predictions/} & prediction script                 & overlay shown in round $N{+}1$ \\
-\texttt{masks/}       & \pth{tools/rasterize.py}          & training script \\
+\texttt{annotations/} & the annotator, at each click & \pth{tools/rasterize.py} \\
+\texttt{masks/}       & \pth{tools/rasterize.py}     & the training script \\
+\texttt{models/}      & the training script          & the inference script \\
+\texttt{predictions/} & the inference script         & the annotator, in round $N{+}1$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-What the trainer needs from the clicks is a per-pixel target, and
+What the training script needs from the clicks is a per-pixel target, and
 one helper produces it. \pth{tools/rasterize.py} reads the pair
 files of a round and writes one mask per pair into
 \pth{iteration_N/masks/}, giving each clicked pixel its class index
@@ -256,10 +274,10 @@ Prediction PNGs carry class indices matching
 one palette. The overlay opacity is adjustable and the \texttt{P}
 key shows it while held.
 
-Closing a round is the trainer's job
-(Section~\ref{sec:training}): it writes \texttt{models/} and
-\texttt{predictions/} of round $N$, creates
-\pth{iteration_{N+1}/annotations/}, and increments
+Closing a round is the job of the training and inference scripts
+(Section~\ref{sec:training}): they write \texttt{models/} and
+\texttt{predictions/} of round $N$, create
+\pth{iteration_{N+1}/annotations/}, and increment
 \pth{current_iteration}. The next session opens on the new
 round with the fresh predictions as the overlay.
 
