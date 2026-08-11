@@ -27,3 +27,6 @@ tools_scratch/*
 # Graphical abstract: intermediarios do standalone
 figures/graphical_abstract.aux
 figures/graphical_abstract.log
+
+# Copia limpa para envio (regeravel: python tools/make_clean.py)
+entrega/
