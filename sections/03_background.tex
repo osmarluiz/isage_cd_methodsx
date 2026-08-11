@@ -4,50 +4,44 @@
 
 Change detection is one of the most widely used operations in remote
 sensing. Comparing two co-registered images of the same place at
-different dates reveals where the surface has changed, and the same
-operation serves many fields. It maps urban
-expansion~\cite{chen2020spatial}, assesses damage after
-disasters~\cite{gupta2019xbd}, tracks agricultural and land-cover
-transitions~\cite{yang2021asymmetric}, and monitors
-deforestation~\cite{prodes,mapbiomas}. The deep-learning methods behind
-these applications~\cite{daudt2018fully}, and their shared challenges,
-are the subject of dedicated surveys~\cite{khelifi2020deep,shi2020change}.
+different dates shows where the surface changed, which is how urban
+expansion~\cite{chen2020spatial}, post-disaster
+damage~\cite{gupta2019xbd}, land-cover
+transitions~\cite{yang2021asymmetric} and
+deforestation~\cite{prodes,mapbiomas} are mapped. The supervised
+methods behind these applications are built on pixel-level
+labels~\cite{daudt2018fully,khelifi2020deep}, and producing those
+labels is the main cost of a dataset. An analyst inspects the imagery,
+decides the state of each pixel, and paints a dense mask. Change is
+harder to label than a single image because the unit is a pair of
+dates rather than one scene, and because the same scene can be
+labeled against several reference dates, which multiplies the work.
 
-Supervised change detection is built on pixel-level labels, and
-producing them is the main cost of a dataset. An analyst inspects the
-imagery, decides the state of each pixel, and paints a dense mask.
-Change makes this harder than single-image labeling in two ways. The
-unit is a pair of co-registered dates rather than one image, so the
-analyst reasons about both at once, and the same scene can be labeled
-against several reference dates, which multiplies the work. Expert time
-becomes the binding constraint, and reducing it has driven a range of
-label-efficient strategies. Weakly supervised methods replace dense
-masks with image-level tags or
-scribbles~\cite{lin2016scribblesup,hua2021semantic}. Semi-supervised
-methods combine a small labeled set with a large unlabeled
-one~\cite{zhou2026decaf}. Active learning chooses which samples the
-human should label next~\cite{ren2021survey}. Human-in-the-loop
-annotation lets the model and the user take turns, the model proposing a
-mask and the user correcting it~\cite{amershi2014power,lenczner2022dial}.
-Point supervision replaces dense masks with a small set of
-clicks~\cite{Bearman2016}, and recent work brings it to change detection
-specifically~\cite{fang2024point}.
+Expert time is the binding constraint, and several families of methods
+reduce it. Weak supervision replaces dense masks with image-level tags
+or scribbles~\cite{lin2016scribblesup,hua2021semantic}, semi-supervised
+methods pair a small labeled set with a large unlabeled
+one~\cite{zhou2026decaf}, active learning chooses what the human
+labels next~\cite{ren2021survey}, human-in-the-loop annotation lets
+the model and the user take turns~\cite{amershi2014power,lenczner2022dial},
+and point supervision replaces the mask with a few
+clicks~\cite{Bearman2016}, including for change detection
+specifically~\cite{fang2024point}. These reduce how many labels are
+needed. They leave open where a label lives once a scene has more than
+two dates, which is a question about the annotation record rather than
+about the learning algorithm.
 
-iSAGE~\cite{isage} (\emph{Iterative Sparse Annotation Guided by Expert})
-is a recent point-based, human-in-the-loop framework for remote-sensing
-semantic segmentation. An expert clicks only on the model's confident
-mistakes and an error-weighted loss amplifies the gradient at each
-click, with no pseudo-labels, conditional random fields, or
-foundation-model prompts, and the annotation record is itself the
-dataset. On single-image benchmarks it recovered most of the quality of
-dense labeling from far less than 1\% of the pixels. iSAGE was designed
-for the single-image case, and its label file, click loop, and
-error-weighted loss all assume one image per annotation. This article
-introduces \textbf{iSAGE-CD}, an adaptation of iSAGE to change
-detection. iSAGE-CD is a general annotation tool that applies to any
-bi-temporal change task on any co-registered imagery. We describe the
-tool, its pair-anchored session format, and the annotation workflow, and
-we illustrate them with a working annotation session. The aim is to
-document a reusable method rather than to run a controlled experiment,
-and a full quantitative evaluation is the subject of a separate
-manuscript in preparation.
+iSAGE~\cite{isage} (\emph{Iterative Sparse Annotation Guided by
+Expert}) is a point-based, human-in-the-loop framework for
+remote-sensing semantic segmentation in which an expert clicks on the
+model's mistakes, an error-weighted loss amplifies the gradient at
+each click, and the annotation record is itself the dataset. On
+single-image benchmarks it recovered most of the quality of dense
+labeling from far less than 1\% of the pixels. Its label file and
+session layout assume one image per annotation, so there is nowhere to
+record which two dates a click refers to. This article introduces
+\textbf{iSAGE-CD}, which extends iSAGE to the bi-temporal case by
+anchoring every label to a (before, after) pair, and documents the
+tool and its session format through a working annotation session over
+the Brazilian Amazon. A full quantitative evaluation is the subject of
+a separate manuscript in preparation.
